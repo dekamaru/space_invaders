@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "util/queue.h"
+#include "util/endian.h"
+#include "network/net.h"
 
 //TODO: сделать прослойку серверную, на сервере игровой луп, в неём вся логика, клиент только отображение
 // СЕРВЕР: два потока
@@ -8,9 +10,12 @@
 // сначала сервер делать, использовать telnet
 
 
+typedef struct tPack {
+    int value;
+} tPack;
+
 int main(int *argc, char **argv)
 {
-    struct Queue* q = queue_create();
-
+    net_server_start(29015);
     return 0;
 }
