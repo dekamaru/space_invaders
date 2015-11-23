@@ -16,6 +16,6 @@ typedef struct tPack {
 
 int main(int *argc, char **argv)
 {
-    net_server_start(29015);
+    net_server_start(27015);
     return 0;
 }
