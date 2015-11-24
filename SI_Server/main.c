@@ -9,11 +9,6 @@
 // pthreads, сокеты, очереди
 // сначала сервер делать, использовать telnet
 
-
-typedef struct tPack {
-    int value;
-} tPack;
-
 int main(int *argc, char **argv)
 {
     net_server_start(27015);
