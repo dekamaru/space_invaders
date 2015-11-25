@@ -48,6 +48,7 @@ int net_client_connect(char* addr, int port) {
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (net_socket == -1) {
         puts("net_client_connect(): socket creating fail!");
+        net_status = DISCONNECTED;
         return 0;
     }
     net_server.sin_addr.s_addr = inet_addr(addr);
@@ -55,13 +56,15 @@ int net_client_connect(char* addr, int port) {
     net_server.sin_port = htons(port);
     if(connect(net_socket, (struct sockaddr *)&net_server, sizeof(net_server)) < 0) {
         puts("net_client_connect(): connection failed");
+        net_status = DISCONNECTED;
         return 0;
     }
+    net_status = CONNECTED;
     return 1;
 }
 
-int net_client_receive(char* buffer) {
-    return recv(net_socket, buffer, 2000, 0) > 0;
+int net_client_receive(char* buffer, int length) {
+    return recv(net_socket, buffer, length, 0) > 0;
 }
 
 int net_client_send(char* message, int length) {
@@ -82,6 +85,3 @@ void *net_connection_handler(void *socket_desc) {
     free(socket_desc);
     return 0;
 }
-
-
-
