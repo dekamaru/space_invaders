@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <string.h>
+#include "packet.h"
 #include "net.h"
 #include "../util/endian.h"
 
@@ -72,16 +73,14 @@ int net_client_send(char* message, int length) {
 }
 
 void *net_connection_handler(void *socket_desc) {
+    Packet *p;
     int sock = *(int*)socket_desc;
-    char *message;
-    char client_reply[2000];
-    message = "Message of the day: hello!";
-    write(sock, message, strlen(message));
-
-    while(recv(sock, client_reply, 2000, 0) > 0) {
-        puts(client_reply);
+    char* client_reply = malloc(1000);
+    while(recv(sock, client_reply, 1000, 0) > 0) {
+        p = packet_deserialize(client_reply);
+        printf("Received packet: %i %i %s\n", p->packet_id, p->data_length, p->data);
+        fflush(stdout);
     }
-
     free(socket_desc);
     return 0;
 }

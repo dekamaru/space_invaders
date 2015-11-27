@@ -1,16 +1,12 @@
 #include <stdio.h>
+#include <string.h>
 #include "util/queue.h"
 #include "util/endian.h"
 #include "network/net.h"
-
-//TODO: сделать прослойку серверную, на сервере игровой луп, в неём вся логика, клиент только отображение
-// СЕРВЕР: два потока
-
-// pthreads, сокеты, очереди
-// сначала сервер делать, использовать telnet
+#include "network/packet.h"
 
 int main(int *argc, char **argv)
 {
-    net_server_start(27015);
+    net_server_start(27016);
     return 0;
 }
