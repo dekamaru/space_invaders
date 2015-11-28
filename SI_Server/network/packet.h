@@ -1,11 +1,9 @@
+#include <stdint.h>
+
 typedef struct Packet {
-    int packet_id;
-    int data_length;
-    char* data;
+    uint32_t packet_id;
+    uint32_t data_length;
+    char data[0];
 } Packet;
 
-void packet_serialize(unsigned char* buffer, Packet *p);
-int packet_size(Packet *p);
-unsigned char* packet_create(int packet_id, int data_length, char* data);
-Packet* packet_deserialize(unsigned char* buffer);
-int packet_buffer_size(int data_length);
+char* packet_create(uint32_t packet_id, uint32_t data_length, char* data);

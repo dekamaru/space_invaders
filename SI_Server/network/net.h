@@ -10,4 +10,4 @@ void *net_connection_handler(void *);
 
 int net_client_connect(char* addr, int port);
 int net_client_receive(char* buffer, int length);
-int net_client_send(char* message, int length);
+int net_client_send(struct Packet* p);

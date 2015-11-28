@@ -5,7 +5,6 @@
 #include <string.h>
 #include "packet.h"
 #include "net.h"
-#include "../util/endian.h"
 
 #define MAX_CONNECTIONS 2
 
@@ -32,7 +31,9 @@ int net_server_start(int port) {
         return 0;
     }
     puts("net_server_start(): binding success");
-
+    // create threads
+    // create packet queue
+    // client только положить в очередь
     listen(net_socket, MAX_CONNECTIONS);
     while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c))) {
         pthread_t net_sniffer_thread;
@@ -68,16 +69,20 @@ int net_client_receive(char* buffer, int length) {
     return recv(net_socket, buffer, length, 0) > 0;
 }
 
-int net_client_send(char* message, int length) {
-    return send(net_socket, message, length, 0) > 0;
+int net_client_send(char* message) {
+    return send(net_socket, message, sizeof(Packet) + p->data_length, 0) > 0;
 }
 
 void *net_connection_handler(void *socket_desc) {
+
+    // receive для headera структуры, если получилось то receive data,
+
     Packet *p;
     int sock = *(int*)socket_desc;
-    char* client_reply = malloc(1000);
-    while(recv(sock, client_reply, 1000, 0) > 0) {
-        p = packet_deserialize(client_reply);
+    char* client_reply = malloc(1024);
+    while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
+        p = (Packet*) client_reply;
+
         printf("Received packet: %i %i %s\n", p->packet_id, p->data_length, p->data);
         fflush(stdout);
     }
