@@ -8,7 +8,7 @@ Queue* queue_create() {
     return q;
 }
 
-void queue_push(Queue* q, char* value) {
+void queue_push(Queue* q, struct Packet* value) {
     Node* t = malloc(sizeof(Node));
     t->data = value;
     t->next = NULL;
@@ -21,11 +21,11 @@ void queue_push(Queue* q, char* value) {
     q->size++;
 }
 
-char* queue_pop(Queue* q) {
+struct Packet* queue_pop(Queue* q) {
     if (q->first == NULL && q->last == NULL) {
         return 0;
     }
-    char* result = q->first->data;
+    struct Packet* result = q->first->data;
     Node* h = NULL;
     Node* p = NULL;
     h = q->first;
@@ -40,7 +40,8 @@ char* queue_pop(Queue* q) {
 }
 
 int queue_empty(Queue* q) {
-    return q->size == 0;
+    if(q->size == 0) return 1;
+    return 0;
 }
 
 int queue_size(Queue* q) {

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "packet.h"
 #include "net.h"
+#include "../util/queue.h"
 
 #define MAX_CONNECTIONS 2
 
@@ -31,17 +32,25 @@ int net_server_start(int port) {
         return 0;
     }
     puts("net_server_start(): binding success");
-    // create threads
-    // create packet queue
-    // client только положить в очередь
+
+    Queue* packets_queue = queue_create();
+    net_thread_args args;
+    args.q = packets_queue;
+
+    pthread_t game_thread;
+    if (pthread_create(&game_thread, NULL, net_game_thread, (void*) &args) < 0) {
+        puts("net_server_start(): could not create game thread");
+    }
+
     listen(net_socket, MAX_CONNECTIONS);
     while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c))) {
         pthread_t net_sniffer_thread;
         net_new_sock = malloc(1);
         *net_new_sock = net_new_socket;
+        args.socket = net_new_sock;
         // pre init()?
-        if(pthread_create(&net_sniffer_thread, NULL, net_connection_handler, (void*) net_new_sock) < 0) {
-            puts("net_server_start(): could not create thread");
+        if(pthread_create(&net_sniffer_thread, NULL, net_connection_handler, (void*) &args) < 0) {
+            puts("net_server_start(): could not create client thread");
         }
     }
 }
@@ -70,22 +79,33 @@ int net_client_receive(char* buffer, int length) {
 }
 
 int net_client_send(char* message) {
-    return send(net_socket, message, sizeof(Packet) + p->data_length, 0) > 0;
+    Packet* buffer = (Packet*) message;
+    return send(net_socket, message, sizeof(Packet) + buffer->data_length, 0) > 0;
 }
 
-void *net_connection_handler(void *socket_desc) {
+void *net_game_thread(void* args) {
+    net_thread_args *arg = (net_thread_args*) args;
+    while(1) {
+        if (!queue_empty(arg->q)) {
+            Packet *p = queue_pop(arg->q);
+            printf("Packet ID: %i, Packet length: %i, Packet data: %s\n", p->packet_id, p->data_length, p->data);
+        }
+    }
+}
 
-    // receive для headera структуры, если получилось то receive data,
-
-    Packet *p;
-    int sock = *(int*)socket_desc;
+void *net_connection_handler(void* args) {
+    net_thread_args *arg = (net_thread_args* )args;
+    int sock = *(int*)arg->socket;
     char* client_reply = malloc(1024);
     while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
-        p = (Packet*) client_reply;
-
-        printf("Received packet: %i %i %s\n", p->packet_id, p->data_length, p->data);
-        fflush(stdout);
+        Packet* p = (Packet*) client_reply;
+        if (p->data_length != 0) {
+            char* received_data = malloc(p->data_length);
+            recv(sock, received_data, p->data_length, 0);
+            strcpy(p->data, received_data);
+            queue_push(arg->q, p);
+        }
     }
-    free(socket_desc);
+    free(arg->socket);
     return 0;
 }
