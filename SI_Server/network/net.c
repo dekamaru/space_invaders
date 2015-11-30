@@ -33,26 +33,29 @@ int net_server_start(int port) {
     }
     puts("net_server_start(): binding success");
 
-    Queue* packets_queue = queue_create();
-    net_thread_args args;
-    args.q = packets_queue;
-
-    pthread_t game_thread;
-    if (pthread_create(&game_thread, NULL, net_game_thread, (void*) &args) < 0) {
-        puts("net_server_start(): could not create game thread");
-    }
+    Queue* receive = queue_create();
+    net_client_descr_t clients[MAX_CONNECTIONS];
+    int clients_count = 0;
 
     listen(net_socket, MAX_CONNECTIONS);
-    while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c))) {
-        pthread_t net_sniffer_thread;
+    while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c)) && clients_count < MAX_CONNECTIONS) {
+        pthread_t net_receive_thread, net_send_thread;
+        clients[clients_count].receive = receive;
+        clients[clients_count].send = queue_create();
+
         net_new_sock = malloc(1);
         *net_new_sock = net_new_socket;
-        args.socket = net_new_sock;
-        // pre init()?
-        if(pthread_create(&net_sniffer_thread, NULL, net_connection_handler, (void*) &args) < 0) {
-            puts("net_server_start(): could not create client thread");
-        }
+        clients[clients_count].socket = net_new_sock;
+
+        pthread_create(&net_receive_thread, NULL, net_server_receive, (void*) &clients[clients_count]);
+        pthread_create(&net_send_thread, NULL, net_server_send, (void*) &clients[clients_count]);
+        if (clients_count == MAX_CONNECTIONS - 1) break;
+        clients_count++;
     }
+    pthread_t game_thread;
+    pthread_create(&game_thread, NULL, net_game_thread, clients);
+
+    while(1) {}
 }
 
 int net_client_connect(char* addr, int port) {
@@ -83,19 +86,20 @@ int net_client_send(char* message) {
     return send(net_socket, message, sizeof(Packet) + buffer->data_length, 0) > 0;
 }
 
-void *net_game_thread(void* args) {
-    net_thread_args *arg = (net_thread_args*) args;
+void *net_game_thread(net_client_descr_t *clients) {
     while(1) {
-        if (!queue_empty(arg->q)) {
-            Packet *p = queue_pop(arg->q);
+        Queue* receive = clients[0].receive;
+        if (!queue_empty(receive)) {
+            Packet *p = queue_pop(receive);
             printf("Packet ID: %i, Packet length: %i, Packet data: %s\n", p->packet_id, p->data_length, p->data);
+            free(p);
         }
     }
 }
 
-void *net_connection_handler(void* args) {
-    net_thread_args *arg = (net_thread_args* )args;
-    int sock = *(int*)arg->socket;
+void *net_server_receive(void* args) {
+    net_client_descr_t *arguments = (net_client_descr_t*) args;
+    int sock = *(int*) arguments->socket;
     char* client_reply = malloc(1024);
     while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
         Packet* p = (Packet*) client_reply;
@@ -103,9 +107,21 @@ void *net_connection_handler(void* args) {
             char* received_data = malloc(p->data_length);
             recv(sock, received_data, p->data_length, 0);
             strcpy(p->data, received_data);
-            queue_push(arg->q, p);
+            queue_push(arguments->receive, p);
         }
     }
-    free(arg->socket);
+    free(arguments->socket);
     return 0;
+}
+
+void *net_server_send(void* args) {
+    net_client_descr_t *arguments = (net_client_descr_t*) args;
+    while(1) {
+        if (!queue_empty(arguments->send)) {
+            Packet *p = queue_pop(arguments->send);
+            printf("Sending packet id: %i\n", p->packet_id);
+            free(p);
+            fflush(stdout);
+        }
+    }
 }
