@@ -1,6 +1,6 @@
 #include "packet.h"
+
 #include <string.h>
-#include <stdio.h>
 
 //TODO: use outsided buffer, no creating one
 char* packet_create(uint32_t packet_id, uint32_t data_length, char* data) {

@@ -1,5 +1,10 @@
+#ifndef NETWORK_NET_H
+#define NETWORK_NET_H
+
 typedef enum {CONNECTED, DISCONNECTED} net_state;
+typedef enum {RUNNING, SHUTDOWN} net_server_state;
 net_state net_status;
+net_server_state net_server_status;
 
 typedef struct net_client_descr_t {
     int socket;
@@ -19,3 +24,5 @@ void *net_game_thread(net_client_descr_t *);
 int net_client_connect(char* addr, int port);
 int net_client_receive(char* buffer, int length);
 int net_client_send(char* message);
+
+#endif // NETWORK_NET_H

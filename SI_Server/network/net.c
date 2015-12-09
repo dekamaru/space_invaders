@@ -54,8 +54,9 @@ int net_server_start(int port) {
     }
     pthread_t game_thread;
     pthread_create(&game_thread, NULL, net_game_thread, clients);
+    net_server_status = RUNNING;
 
-    while(1) {}
+    while(net_server_status == RUNNING) {} // sleeeeeeeeeep
 }
 
 int net_client_connect(char* addr, int port) {
@@ -87,13 +88,14 @@ int net_client_send(char* message) {
 }
 
 void *net_game_thread(net_client_descr_t *clients) {
+
     while(1) {
         Queue* receive = clients[0].receive;
         if (!queue_empty(receive)) {
             Packet *p = queue_pop(receive);
-            printf("Packet ID: %i, Packet length: %i, Packet data: %s\n", p->packet_id, p->data_length, p->data);
             free(p);
         }
+        // send pppp
     }
 }
 

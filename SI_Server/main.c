@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include "network/packet.h"
 #include "network/net.h"
 
 int main(int *argc, char **argv)

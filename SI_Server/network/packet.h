@@ -1,3 +1,6 @@
+#ifndef NETWORK_PACKET_H
+#define NETWORK_PACKET_H
+
 #include <stdint.h>
 
 typedef struct Packet {
@@ -7,3 +10,5 @@ typedef struct Packet {
 } Packet;
 
 char* packet_create(uint32_t packet_id, uint32_t data_length, char* data);
+
+#endif // NETWORK_PACKET_H
