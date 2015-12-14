@@ -3,11 +3,12 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <string.h>
+
 #include "packet.h"
 #include "net.h"
 #include "../util/queue.h"
 
-#define MAX_CONNECTIONS 2
+#include "../game/game.h"
 
 struct sockaddr_in net_server, net_client;
 
@@ -46,6 +47,12 @@ int net_server_start(int port) {
         net_new_sock = malloc(1);
         *net_new_sock = net_new_socket;
         clients[clients_count].socket = net_new_sock;
+
+        // sending client his id
+        char* handshake_message = malloc(2);
+        packet_write_int(handshake_message, clients_count);
+        char* handshake = packet_create(1, 2, handshake_message);
+        send(net_new_sock, handshake, strlen(handshake), 0);
 
         pthread_create(&net_receive_thread, NULL, net_server_receive, (void*) &clients[clients_count]);
         pthread_create(&net_send_thread, NULL, net_server_send, (void*) &clients[clients_count]);
@@ -88,11 +95,20 @@ int net_client_send(char* message) {
 }
 
 void *net_game_thread(net_client_descr_t *clients) {
+    Queue *game_send = queue_create();
+
+    Field* field = malloc(sizeof(Field));
+    game_init(field);
+    printf("Player 1 before: X: %i\n", field->players[1].x);
+    game_packet_handle(4, "1:1", field);
+    printf("Player 1 after: X: %i", field->players[1].x);
+    fflush(stdout);
 
     while(1) {
         Queue* receive = clients[0].receive;
         if (!queue_empty(receive)) {
             Packet *p = queue_pop(receive);
+            game_packet_handle(p->packet_id, p->data, field);
             free(p);
         }
         // send pppp

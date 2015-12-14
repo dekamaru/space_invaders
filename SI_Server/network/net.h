@@ -1,6 +1,8 @@
 #ifndef NETWORK_NET_H
 #define NETWORK_NET_H
 
+#define MAX_CONNECTIONS 2
+
 typedef enum {CONNECTED, DISCONNECTED} net_state;
 typedef enum {RUNNING, SHUTDOWN} net_server_state;
 net_state net_status;
