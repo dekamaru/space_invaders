@@ -6,6 +6,7 @@
 typedef struct Player {
     int x, y;
     int lives;
+    int width, height; // for collision box
     int isShooting;
 } Player;
 

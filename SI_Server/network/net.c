@@ -99,10 +99,6 @@ void *net_game_thread(net_client_descr_t *clients) {
 
     Field* field = malloc(sizeof(Field));
     game_init(field);
-    printf("Player 1 before: X: %i\n", field->players[1].x);
-    game_packet_handle(4, "1:1", field);
-    printf("Player 1 after: X: %i", field->players[1].x);
-    fflush(stdout);
 
     while(1) {
         Queue* receive = clients[0].receive;
@@ -111,6 +107,7 @@ void *net_game_thread(net_client_descr_t *clients) {
             game_packet_handle(p->packet_id, p->data, field);
             free(p);
         }
+        game_update(field);
         // send pppp
     }
 }

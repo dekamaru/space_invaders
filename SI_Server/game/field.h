@@ -5,10 +5,17 @@
 #include "enemy.h"
 #include "gameobject.h"
 
+#define MAX_PLAYERS 2
+#define MAX_ENEMIES 30
+#define MAX_OBJECTS 1000
+
 typedef struct Field {
-    Player players[2];
-    Enemy enemies[30];
-    GameObject objects[1000]; // bullets, etc..
+    Player players[MAX_PLAYERS];
+    Enemy enemies[MAX_ENEMIES];
+    GameObject objects[MAX_OBJECTS]; // bullets, etc..
 } Field;
+
+int field_enemies_count(Field *f); // counting alive enemies
+int field_enemies_find_space(Field *f);
 
 #endif // GAME_FIELD_H

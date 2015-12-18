@@ -4,6 +4,7 @@ Player player_create(int x, int y) {
     Player p;
     p.x = x;
     p.y = y;
+    p.width = p.height = 32;
     p.lives = 3;
     p.isShooting = 0;
     return p;
