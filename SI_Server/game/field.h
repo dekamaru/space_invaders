@@ -16,6 +16,6 @@ typedef struct Field {
 } Field;
 
 int field_enemies_count(Field *f); // counting alive enemies
-int field_enemies_find_space(Field *f);
+int field_enemies_find_space(Field *f); // get index of non-alive enemy
 
 #endif // GAME_FIELD_H

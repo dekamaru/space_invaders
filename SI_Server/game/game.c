@@ -1,37 +1,17 @@
 #include "game.h"
 
+#include <time.h>
+#include <stdlib.h>
+
 void game_init(Field* field) {
-    /* Spawn players */
     field->players[0] = player_create(32, WORLD_HEIGHT - 32);
     field->players[1] = player_create(WORLD_WIDTH - 64, WORLD_HEIGHT - 32);
 }
 
 void game_update(Field* field) {
-    // update enemies, create enemies, shoot enemies
-    // clear dead enemies (setting new x,y, type and set alive = true)
-    /*
-        1. GAMEOBJECTS:
-            1. Update gameobjects coordinates
-            2. Check gameobject collisions
-            3. Check reach bound of world
-
-        2. ENEMIES:
-            1. Update enemies coordinates
-            2. Check, if enemy reached bound of world, then destroy him
-            3. Check enemy collision with player, if collides - set player lives - 1.
-            4. Checking chance of shooting enemy
-
-    */
-    if (field_enemies_count(f) < MAX_SPAWNED_ENEMIES) {
-        //spawn chance, this function calls 60 times on second. Enemy must spawn 1 time on 5 seconds (ex)
-        //if (field_enemies_find_space())
-    }
-    /*
-        int MAX_ENEMIES = 10; may be defined?
-        field_find_enemy_space -- return index of enemies[] array
-
-    */
-
+    srand(time(NULL));
+    game_update_gameobjects(field);
+    game_update_enemies(field);
 }
 
 void game_packet_handle(int packet_id, char* packet_data, Field *f) {
@@ -44,5 +24,40 @@ void game_packet_handle(int packet_id, char* packet_data, Field *f) {
             player_move(&f->players[player_id], direction);
         }
         break;
+    }
+}
+
+void game_update_gameobjects(Field* field) {
+    for(int i = 0; i < MAX_OBJECTS; i++) {
+        if (field->objects[i].alive == 1) {
+            gameobject_move(&field->objects[i]); // update coords
+            if (field->objects[i].y > WORLD_HEIGHT) { // if out of screen
+                field->objects[i].alive = 0; // destroy object
+            }
+            // CHECK COLISSIONS!
+        }
+    }
+}
+
+void game_update_enemies(Field* field) {
+    for(int i = 0; i < MAX_ENEMIES; i++) {
+        if (field->enemies[i].alive == 1) {
+            enemy_move(&field->enemies[i]);
+            if (rand() % 1000 == ENEMY_SHOOT_CHANCE) {
+                enemy_shoot(); // TODO: release that
+            }
+            if(field->enemies[i].y > WORLD_HEIGHT) {
+                field->enemies[i].alive = 0;
+            }
+            // TODO: CHECK COLISSION WITH PLAYER
+
+        }
+    }
+
+    if (field_enemies_count(field) < MAX_SPAWNED_ENEMIES) {
+        if (rand() % 1000 == ENEMY_SPAWN_CHANCE) {
+            int write_index = field_enemies_find_space(field);
+            field->enemies[write_index] = enemy_spawn(1); // spawn enemy with type 1
+        }
     }
 }

@@ -15,6 +15,6 @@ Enemy enemy_spawn(int type) {
     return e;
 }
 
-void enemy_destroy(Enemy* e) {
-    e->alive = 0;
+void enemy_shoot() {
+
 }

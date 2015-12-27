@@ -10,6 +10,6 @@ typedef struct Enemy {
 } Enemy;
 
 Enemy enemy_spawn(int type);
-void enemy_destroy(Enemy* e);
+void enemy_shoot();
 
 #endif // GAME_ENEMY_H

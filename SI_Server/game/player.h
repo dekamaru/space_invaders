@@ -7,7 +7,7 @@ typedef struct Player {
     int x, y;
     int lives;
     int width, height; // for collision box
-    int isShooting;
+    int score;
 } Player;
 
 Player player_create(int x, int y);
