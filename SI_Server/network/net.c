@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "packet.h"
 #include "net.h"
@@ -12,7 +13,7 @@
 
 struct sockaddr_in net_server, net_client;
 
-int net_port_bind(int port) {
+int net_port_bind(uint16_t port) {
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (net_socket == -1) {
         puts("net_port_bind(): socket creating fail!");
@@ -27,7 +28,7 @@ int net_port_bind(int port) {
     return 1;
 }
 
-int net_server_start(int port) {
+int net_server_start(uint16_t port) {
     if (net_port_bind(port) == 0) {
         puts("net_server_start(): bind fail!");
         return 0;
@@ -41,18 +42,14 @@ int net_server_start(int port) {
     listen(net_socket, MAX_CONNECTIONS);
     while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c)) && clients_count < MAX_CONNECTIONS) {
         pthread_t net_receive_thread, net_send_thread;
+
+        clients[clients_count].socket = net_new_socket;
         clients[clients_count].receive = receive;
         clients[clients_count].send = queue_create();
 
-        net_new_sock = malloc(1);
-        *net_new_sock = net_new_socket;
-        clients[clients_count].socket = net_new_sock;
-
         // sending client his id
-        char* handshake_message = malloc(2);
-        packet_write_int(handshake_message, clients_count);
-        char* handshake = packet_create(1, 2, handshake_message);
-        send(net_new_sock, handshake, strlen(handshake), 0);
+        char* handshake = packet_create_handshake(clients_count);
+        send(net_new_socket, handshake, strlen(handshake), 0);
 
         pthread_create(&net_receive_thread, NULL, net_server_receive, (void*) &clients[clients_count]);
         pthread_create(&net_send_thread, NULL, net_server_send, (void*) &clients[clients_count]);
@@ -60,13 +57,13 @@ int net_server_start(int port) {
         clients_count++;
     }
     pthread_t game_thread;
-    pthread_create(&game_thread, NULL, net_game_thread, clients);
+    pthread_create(&game_thread, NULL, (void *(*)(void *)) net_game_thread, clients);
     net_server_status = RUNNING;
 
     while(net_server_status == RUNNING) {} // sleeeeeeeeeep
 }
 
-int net_client_connect(char* addr, int port) {
+int net_client_connect(char* addr, uint16_t port) {
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (net_socket == -1) {
         puts("net_client_connect(): socket creating fail!");
@@ -85,7 +82,7 @@ int net_client_connect(char* addr, int port) {
     return 1;
 }
 
-int net_client_receive(char* buffer, int length) {
+int net_client_receive(char* buffer, size_t length) {
     return recv(net_socket, buffer, length, 0) > 0;
 }
 
@@ -95,26 +92,28 @@ int net_client_send(char* message) {
 }
 
 void *net_game_thread(net_client_descr_t *clients) {
+    printf("Game thread started!\n");
+    fflush(stdout);
     Queue *game_send = queue_create();
 
     Field* field = malloc(sizeof(Field));
     game_init(field);
 
     while(1) {
-        Queue* receive = clients[0].receive;
+        /*Queue* receive = clients[0].receive;
         if (!queue_empty(receive)) {
             Packet *p = queue_pop(receive);
             game_packet_handle(p->packet_id, p->data, field);
             free(p);
         }
-        game_update(field);
+        game_update(field);*/
         // send pppp
     }
 }
 
 void *net_server_receive(void* args) {
     net_client_descr_t *arguments = (net_client_descr_t*) args;
-    int sock = *(int*) arguments->socket;
+    int sock = arguments->socket;
     char* client_reply = malloc(1024);
     while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
         Packet* p = (Packet*) client_reply;
@@ -125,7 +124,7 @@ void *net_server_receive(void* args) {
             queue_push(arguments->receive, p);
         }
     }
-    free(arguments->socket);
+    free((int*) arguments->socket);
     return 0;
 }
 

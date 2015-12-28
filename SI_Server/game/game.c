@@ -19,9 +19,9 @@ void game_packet_handle(int packet_id, char* packet_data, Field *f) {
         case 4:
         {
             // PLAYER_MOVE (id player, direction)
-            int player_id = packet_read_int(&packet_data);
-            int direction = packet_read_int(&packet_data);
-            player_move(&f->players[player_id], direction);
+            //int player_id = packet_read_int(&packet_data);
+            //int direction = packet_read_int(&packet_data); TODO!!!
+            //player_move(&f->players[player_id], direction);
         }
         break;
     }
@@ -42,9 +42,9 @@ void game_update_gameobjects(Field* field) {
 void game_update_enemies(Field* field) {
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (field->enemies[i].alive == 1) {
-            enemy_move(&field->enemies[i]);
+            //enemy_move(&field->enemies[i]); //TODO: release that
             if (rand() % 1000 == ENEMY_SHOOT_CHANCE) {
-                enemy_shoot(); // TODO: release that
+                //enemy_shoot(); // TODO: release that
             }
             if(field->enemies[i].y > WORLD_HEIGHT) {
                 field->enemies[i].alive = 0;

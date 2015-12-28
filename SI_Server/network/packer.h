@@ -6,9 +6,9 @@
 #include "../game/gameobject.h"
 #include "../game/field.h"
 
-void packer_pack_player(char* buffer, Player* p);
-void packer_pack_enemy(char* buffer, Enemy* e);
-void packer_pack_gameobject(char* buffer, GameObject* go);
+int packer_pack_player(char* buffer, Player* p);
+int packer_pack_enemy(char* buffer, Enemy* e);
+int packer_pack_gameobject(char* buffer, GameObject* go);
 char* packer_pack_field(Field *f);
 
 #endif // NETWORK_PACKER_H

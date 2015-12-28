@@ -1,49 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "packer.h"
-/*
-        FIELD OBJECT TYPES:
-        1 - player (x, y, lives)
-        2 - enemy (x, y, health, type, alive)
-        3 - gameobject (x, y, type, alive)
 
-        Example: 1:x:y:lives:2:enemy:x:y:type:alive:3:x:y:type:alive
-*/
-void packer_pack_player(char* buffer, Player* p) {
-    packet_write_int(buffer, 1);
-    packet_write_int(buffer, p->x);
-    packet_write_int(buffer, p->y);
-    packet_write_int(buffer, p->lives);
+
+int packer_pack_player(char* buffer, Player* p) {
+    return sprintf(buffer, "%i:%i:%i:%i:%i:", 1, p->x, p->y, p->lives, p->score);
 }
 
-void packer_pack_enemy(char* buffer, Enemy* e) {
-    packet_write_int(buffer, 2);
-    packet_write_int(buffer, e->x);
-    packet_write_int(buffer, e->y);
-    packet_write_int(buffer, e->type);
-    packet_write_int(buffer, e->health);
-    packet_write_int(buffer, e->alive);
+int packer_pack_enemy(char* buffer, Enemy* e) {
+    return sprintf(buffer, "%i:%i:%i:%i:%i:", 2, e->x, e->y, e->type, e->health);
 }
 
-void packer_pack_gameobject(char* buffer, GameObject* go) {
-    packet_write_int(buffer, 3);
-    packet_write_int(buffer, go->x);
-    packet_write_int(buffer, go->y);
-    packet_write_int(buffer, go->type);
-    packet_write_int(buffer, go->alive);
+int packer_pack_gameobject(char* buffer, GameObject* go) {
+    return sprintf(buffer, "%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, 0); // last argument - padding for other packs;
 }
 
 char* packer_pack_field(Field *f) {
     char* buffer = malloc(4096);
-    packer_pack_player(buffer, &f->players[0]);
-    packer_pack_player(buffer, &f->players[1]);
-    for(int i = 0; i < 30; i++) {
+    int size = 0, offset = 0;
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        offset = packer_pack_player(buffer, &f->players[i]);
+        buffer += offset;
+        size += offset;
+    }
+    for(int i = 0; i < MAX_ENEMIES; i++) {
         if (f->enemies[i].alive == 1) {
-            packer_pack_enemy(buffer, &f->enemies[i]);
+            offset = packer_pack_enemy(buffer, &f->enemies[i]);
+            buffer += offset;
+            size += offset;
         }
     }
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < MAX_OBJECTS; i++) {
         if (f->objects[i].alive == 1) {
-            packer_pack_gameobject(buffer, &f->objects[i]);
+            offset = packer_pack_gameobject(buffer, &f->objects[i]);
+            buffer += offset;
+            size += offset;
         }
     }
-    return buffer;
+    return buffer - size;
 }

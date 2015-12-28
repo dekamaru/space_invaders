@@ -9,8 +9,7 @@ typedef struct Packet {
     char data[0];
 } Packet;
 
-char* packet_create(uint32_t packet_id, uint32_t data_length, char* data);
-void packet_write_int(char* buffer, int value);
-int packet_read_int(char** buffer);
+void packet_create(char* buffer, uint32_t packet_id, uint32_t data_length, char* data);
+char* packet_create_handshake(int player_id);
 
 #endif // NETWORK_PACKET_H

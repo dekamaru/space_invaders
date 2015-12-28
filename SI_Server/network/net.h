@@ -1,5 +1,6 @@
 #ifndef NETWORK_NET_H
 #define NETWORK_NET_H
+#include <stdint.h>
 
 #define MAX_CONNECTIONS 2
 
@@ -14,17 +15,16 @@ typedef struct net_client_descr_t {
     struct Queue *send;
 } net_client_descr_t;
 
-int* net_socket, net_new_socket, net_c;
-int* net_new_sock;
+int net_socket, net_new_socket, net_c;
 
-int net_port_bind(int port);
-int net_server_start(int port);
+int net_port_bind(uint16_t port);
+int net_server_start(uint16_t port);
 void *net_server_receive(void *);
 void *net_server_send(void *);
 void *net_game_thread(net_client_descr_t *);
 
-int net_client_connect(char* addr, int port);
-int net_client_receive(char* buffer, int length);
+int net_client_connect(char* addr, uint16_t port);
+int net_client_receive(char* buffer, size_t length);
 int net_client_send(char* message);
 
 #endif // NETWORK_NET_H
