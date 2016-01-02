@@ -12,5 +12,5 @@ int field_enemies_find_space(Field *f) {
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (f->enemies[i].alive == 0) return i;
     }
-    return -1; // TODO: check this in find_space usage!
+    return -1;
 }

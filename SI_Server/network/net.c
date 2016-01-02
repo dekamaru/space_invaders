@@ -10,6 +10,7 @@
 #include "../util/queue.h"
 
 #include "../game/game.h"
+#include "packer.h"
 
 struct sockaddr_in net_server, net_client;
 
@@ -94,20 +95,24 @@ int net_client_send(char* message) {
 void *net_game_thread(net_client_descr_t *clients) {
     printf("Game thread started!\n");
     fflush(stdout);
-    Queue *game_send = queue_create();
 
     Field* field = malloc(sizeof(Field));
+    char* field_buffer; // TODO: magic number
     game_init(field);
 
     while(1) {
-        /*Queue* receive = clients[0].receive;
+        Queue* receive = clients[0].receive;
         if (!queue_empty(receive)) {
             Packet *p = queue_pop(receive);
             game_packet_handle(p->packet_id, p->data, field);
             free(p);
         }
-        game_update(field);*/
-        // send pppp
+        game_update(field);
+        for(int i = 0; i < MAX_CONNECTIONS; i++) {
+            field_buffer = packer_pack_field(field);
+            Packet* p = packet_create(3, strlen(field_buffer), field_buffer);
+            queue_push(clients[i].send, p);
+        }
     }
 }
 
