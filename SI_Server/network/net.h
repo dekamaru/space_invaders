@@ -24,7 +24,7 @@ void *net_server_send(void *);
 void *net_game_thread(net_client_descr_t *);
 
 int net_client_connect(char* addr, uint16_t port);
-int net_client_receive(char* buffer, size_t length);
+int net_client_receive(char* buffer, uint16_t length);
 int net_client_send(char* message);
 
 #endif // NETWORK_NET_H

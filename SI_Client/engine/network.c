@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <stdlib.h>
+#include <string.h>
 #include "network.h"
 
 int net_client_connect(char* addr, uint16_t port) {
@@ -22,4 +24,22 @@ int net_client_connect(char* addr, uint16_t port) {
         return 0;
     }
     return 1;
+}
+
+Packet *net_receive_packet() {
+    char* server_reply = malloc(1024);
+    if(recv(net_socket, server_reply, sizeof(Packet), 0) > 0) {
+        Packet* p = (Packet*) server_reply;
+        if (p->data_length != 0) {
+            char* received_data = malloc(p->data_length);
+            recv(net_socket, received_data, p->data_length, 0);
+            received_data[p->data_length] = 0;
+            strcpy(p->data, received_data);
+            return p;
+        } else {
+            return NULL;
+        }
+    } else {
+        return NULL;
+    }
 }

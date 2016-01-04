@@ -13,4 +13,6 @@ void game_draw(void* renderer);
 void game_event(void* event);
 void game_update();
 
+int client_id;
+
 #endif //SI_CLIENT_GAME_H

@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "engine.h"
-#include "assets.h"
 
 int E_Init() {
     // Engine initialization (textures, sounds, etc...)

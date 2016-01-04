@@ -50,7 +50,8 @@ int net_server_start(uint16_t port) {
 
         // sending client his id
         char* handshake = packet_create_handshake(clients_count);
-        send(net_new_socket, handshake, strlen(handshake), 0);
+        send(net_new_socket, handshake, sizeof(Packet) + 1, 0);
+
 
         pthread_create(&net_receive_thread, NULL, net_server_receive, (void*) &clients[clients_count]);
         pthread_create(&net_send_thread, NULL, net_server_send, (void*) &clients[clients_count]);
@@ -83,7 +84,7 @@ int net_client_connect(char* addr, uint16_t port) {
     return 1;
 }
 
-int net_client_receive(char* buffer, size_t length) {
+int net_client_receive(char* buffer, uint16_t length) {
     return recv(net_socket, buffer, length, 0) > 0;
 }
 
@@ -129,7 +130,8 @@ void *net_server_receive(void* args) {
             queue_push(arguments->receive, p);
         }
     }
-    free((int*) arguments->socket);
+
+    shutdown(arguments->socket, 2); // reset?
     return 0;
 }
 
