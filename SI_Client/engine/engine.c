@@ -1,10 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "engine.h"
-#include "screen.h"
+#include "assets.h"
 
 int E_Init() {
     // Engine initialization (textures, sounds, etc...)
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0 || TTF_Init() != 0) {
         //log: init failed
         return 0;
     }
@@ -19,15 +20,25 @@ int E_Init() {
         // log: create renderer error
         return 0;
     }
+
+    // TODO: load assets!
+
+    Assets* assets_bundle = assets_init();
+    assets_load_font(assets_bundle, "assets/font.ttf", 36);
+    assets_load_font(assets_bundle, "assets/font.ttf", 24);
+    assets_load_font(assets_bundle, "assets/font.ttf", 18);
+
     // ALL THINGS DONE, GO TO MAIN MENU
-    switch_screen(&current_screen, 1);
+    switch_screen(&current_screen, 1, assets_bundle);
+    return 1;
 }
 
 int E_HandleEvent(SDL_Event *event) {
     if (event->type == SDL_QUIT) {
         E_Shutdown();
+    } else {
+        current_screen.event(event);
     }
-    current_screen.event(event);
 }
 
 int E_Update() {

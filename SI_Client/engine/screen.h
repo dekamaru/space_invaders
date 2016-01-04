@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#include "assets.h"
 
 typedef struct E_Screen {
     void (*update)();
@@ -10,6 +11,6 @@ typedef struct E_Screen {
     void (*event)(void*);
 } E_Screen;
 
-void switch_screen(E_Screen *s, int screen_id);
+void switch_screen(E_Screen *s, int screen_id, Assets *a);
 
 #endif //SI_CLIENT_SCREEN_H

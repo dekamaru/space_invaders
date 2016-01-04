@@ -1,0 +1,14 @@
+//
+// Created by dekamaru on 04.01.16.
+//
+
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
+
+#ifndef SI_CLIENT_RENDERER_H
+#define SI_CLIENT_RENDERER_H
+
+void renderer_set_padding(SDL_Rect *r, int padding);
+void renderer_draw_rect(SDL_Rect *r, SDL_Renderer *renderer, SDL_Color color);
+
+#endif //SI_CLIENT_RENDERER_H
