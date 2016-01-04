@@ -11,6 +11,6 @@ typedef struct E_Screen {
     void (*event)(void*);
 } E_Screen;
 
-void switch_screen(E_Screen *s, int screen_id, Assets *a);
+void switch_screen(int screen_id);
 
 #endif //SI_CLIENT_SCREEN_H

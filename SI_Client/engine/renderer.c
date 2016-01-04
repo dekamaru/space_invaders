@@ -3,6 +3,7 @@
 //
 
 #include "renderer.h"
+#include "engine.h"
 
 void renderer_set_padding(SDL_Rect *r, int padding) {
     r->w += padding;
@@ -11,7 +12,7 @@ void renderer_set_padding(SDL_Rect *r, int padding) {
     r->y -= padding / 2;
 }
 
-void renderer_draw_rect(SDL_Rect *r, SDL_Renderer *renderer, SDL_Color color) {
+void renderer_draw_rect(SDL_Rect *r, SDL_Color color) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderDrawRect(renderer, r);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // return back

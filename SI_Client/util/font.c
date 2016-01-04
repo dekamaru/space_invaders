@@ -4,8 +4,9 @@
 
 #include <SDL2/SDL_ttf.h>
 #include "font.h"
+#include "../engine/engine.h"
 
-SDL_Rect font_render(char* message, int x, int y, int centered, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer) {
+SDL_Rect font_render(char* message, int x, int y, int centered, TTF_Font *font, SDL_Color color) {
     int w, h;
     SDL_Surface *surf = TTF_RenderText_Blended(font, message, color);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);

@@ -23,13 +23,13 @@ int E_Init() {
 
     // TODO: load assets!
 
-    Assets* assets_bundle = assets_init();
+    assets_bundle = assets_init();
     assets_load_font(assets_bundle, "assets/font.ttf", 36);
     assets_load_font(assets_bundle, "assets/font.ttf", 24);
     assets_load_font(assets_bundle, "assets/font.ttf", 18);
 
     // ALL THINGS DONE, GO TO MAIN MENU
-    switch_screen(&current_screen, 1, assets_bundle);
+    switch_screen(1);
     return 1;
 }
 

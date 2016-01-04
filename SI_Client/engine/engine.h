@@ -6,7 +6,9 @@ E_State state;
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Event event;
+
 E_Screen current_screen;
+Assets* assets_bundle;
 
 int E_Init();
 int E_HandleEvent(SDL_Event* event);
