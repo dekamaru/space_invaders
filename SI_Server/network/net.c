@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "packet.h"
 #include "net.h"
@@ -11,6 +12,7 @@
 
 #include "../game/game.h"
 #include "packer.h"
+#include "../util/time.h"
 
 struct sockaddr_in net_server, net_client;
 
@@ -38,7 +40,7 @@ int net_server_start(uint16_t port) {
 
     Queue* receive = queue_create();
     net_client_descr_t clients[MAX_CONNECTIONS];
-    int clients_count = 0;
+    clients_count = 0;
 
     listen(net_socket, MAX_CONNECTIONS);
     while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c)) && clients_count < MAX_CONNECTIONS) {
@@ -62,7 +64,7 @@ int net_server_start(uint16_t port) {
     pthread_create(&game_thread, NULL, (void *(*)(void *)) net_game_thread, clients);
     net_server_status = RUNNING;
 
-    while(net_server_status == RUNNING) {} // sleeeeeeeeeep
+    pthread_join(game_thread, NULL); //waiting the game shutdown
 }
 
 int net_client_connect(char* addr, uint16_t port) {
@@ -98,10 +100,22 @@ void *net_game_thread(net_client_descr_t *clients) {
     fflush(stdout);
 
     Field* field = malloc(sizeof(Field));
-    char* field_buffer; // TODO: magic number
+    char* field_buffer;
     game_init(field);
 
-    while(1) {
+    // Limit loop to 30 fps
+    const int FRAMES_PER_SECOND = 30;
+    const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
+    unsigned long next_game_tick = time_get_tick();
+    unsigned long sleep_time = 0;
+
+    for(int i = 0; i < MAX_CONNECTIONS; i++) {
+        // sending packet 2 (game start)
+        Packet *p = (Packet*) packet_create(2, 1, "1");
+        queue_push(clients[i].send, p);
+    }
+    
+    while(net_server_status != SHUTDOWN) {
         Queue* receive = clients[0].receive;
         if (!queue_empty(receive)) {
             Packet *p = queue_pop(receive);
@@ -111,8 +125,15 @@ void *net_game_thread(net_client_descr_t *clients) {
         game_update(field);
         for(int i = 0; i < MAX_CONNECTIONS; i++) {
             field_buffer = packer_pack_field(field);
-            Packet* p = packet_create(3, strlen(field_buffer), field_buffer);
+            Packet* p = (Packet*) packet_create(3, strlen(field_buffer), field_buffer);
             queue_push(clients[i].send, p);
+        }
+
+        // Limiting loop
+        next_game_tick += SKIP_TICKS;
+        sleep_time = next_game_tick - time_get_tick();
+        if(sleep_time >= 0) {
+            usleep(sleep_time);
         }
     }
 }
@@ -130,19 +151,22 @@ void *net_server_receive(void* args) {
             queue_push(arguments->receive, p);
         }
     }
-
-    shutdown(arguments->socket, 2); // reset?
+    if (clients_count == 1) {
+        clients_count--;
+    }
+    shutdown(arguments->socket, 2);
     return 0;
 }
 
 void *net_server_send(void* args) {
     net_client_descr_t *arguments = (net_client_descr_t*) args;
-    while(1) {
+    while(net_server_status != SHUTDOWN) {
         if (!queue_empty(arguments->send)) {
             Packet *p = queue_pop(arguments->send);
-            printf("Sending packet id: %i\n", p->packet_id);
+            char *buffer; // TODO: magic number?
+            buffer = (char*) p;
+            send(arguments->socket, buffer, sizeof(Packet) + p->data_length, 0);
             free(p);
-            fflush(stdout);
         }
     }
 }

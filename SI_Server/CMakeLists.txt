@@ -20,6 +20,6 @@ set(SOURCE_FILES
         network/packet.h
         util/queue.c
         util/queue.h
-        main.c)
+        main.c util/time.c util/time.h)
 
 add_executable(SI_Server ${SOURCE_FILES})

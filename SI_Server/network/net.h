@@ -15,7 +15,7 @@ typedef struct net_client_descr_t {
     struct Queue *send;
 } net_client_descr_t;
 
-int net_socket, net_new_socket, net_c;
+int net_socket, net_new_socket, net_c, clients_count;
 
 int net_port_bind(uint16_t port);
 int net_server_start(uint16_t port);

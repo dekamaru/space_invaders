@@ -2,6 +2,7 @@
 #include "../screen/main_menu.h"
 #include "../screen/game.h"
 #include "engine.h"
+#include "../screen/field.h"
 
 void switch_screen(int screen_id) {
     switch(screen_id) {
@@ -16,6 +17,12 @@ void switch_screen(int screen_id) {
             current_screen.update = &game_update;
             current_screen.event = &game_event;
             game_init();
+            break;
+        case 3:
+            current_screen.draw = &field_draw;
+            current_screen.update = &field_update;
+            current_screen.event = &field_event;
+            field_init();
             break;
         default:
             break;

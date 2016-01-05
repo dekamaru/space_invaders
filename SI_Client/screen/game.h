@@ -12,6 +12,7 @@ void game_init();
 void game_draw(void* renderer);
 void game_event(void* event);
 void game_update();
+void game_wait_start();
 
 int client_id;
 

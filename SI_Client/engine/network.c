@@ -28,7 +28,7 @@ int net_client_connect(char* addr, uint16_t port) {
 
 Packet *net_receive_packet() {
     char* server_reply = malloc(1024);
-    if(recv(net_socket, server_reply, sizeof(Packet), 0) > 0) {
+    if(recv(net_socket, server_reply, sizeof(Packet), 0) == sizeof(Packet)) {
         Packet* p = (Packet*) server_reply;
         if (p->data_length != 0) {
             char* received_data = malloc(p->data_length);

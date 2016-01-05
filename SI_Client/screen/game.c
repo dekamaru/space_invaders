@@ -3,6 +3,7 @@
 //
 
 #include <sys/socket.h>
+#include <pthread.h>
 #include "game.h"
 #include "../engine/network.h"
 #include "../util/font.h"
@@ -11,6 +12,8 @@
 void game_init() {
     Packet *handshake = net_receive_packet();
     sscanf(handshake->data, "%i", &client_id);
+    pthread_t wait_t;
+    pthread_create(&wait_t, NULL, game_wait_start, NULL);
 }
 
 void game_draw(void *renderer) {
@@ -26,6 +29,19 @@ void game_event(void *event) {
 
 }
 
+void game_wait_start() {
+    int started = 0;
+    while(!started) {
+        Packet *p = net_receive_packet();
+        if (p->packet_id == 2) {
+            free(p);
+            switch_screen(3); // field
+            started = 1;
+        }
+    }
+}
+
 void game_update() {
+
 
 }

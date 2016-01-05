@@ -75,7 +75,7 @@ void main_menu_event(void* event) {
 }
 
 void main_menu_connect() {
-    if (net_client_connect("127.0.0.1", 27015) == 0) {
+    if (net_client_connect("127.0.0.1", 26000) == 0) {
         menu_part = 1;
     } else {
         switch_screen(2);
