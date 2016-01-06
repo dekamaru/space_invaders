@@ -4,11 +4,15 @@
 #include "../engine/network.h"
 #include "../util/font.h"
 #include "../engine/engine.h"
+#include "game.h"
 
 void field_init() {
-    pthread_t receiver_t;
+    pthread_t receiver_t, sender_t;
     pthread_create(&receiver_t, NULL, receiver_thread, NULL);
+    pthread_create(&sender_t, NULL, sender_thread, NULL);
     players_count = 0;
+    started = 1;
+    packets_send = queue_create();
 }
 
 void field_draw(void *renderer) {
@@ -20,7 +24,27 @@ void field_draw(void *renderer) {
 }
 
 void field_event(void *event) {
-
+    SDL_Event* e = (SDL_Event*) event;
+    char* buffer = malloc(3);
+    Packet *p;
+    switch(e->type) {
+        case SDL_KEYDOWN:
+            switch(e->key.keysym.sym) {
+                case SDLK_LEFT:
+                    sprintf(buffer, "%i:%i", client_id, 0);
+                    p = (Packet*) net_create_packet(4, 3, buffer);
+                    queue_push(packets_send, p);
+                    break;
+                case SDLK_RIGHT:
+                    sprintf(buffer, "%i:%i", client_id, 1);
+                    p = (Packet*) net_create_packet(4, 3, buffer);
+                    queue_push(packets_send, p);
+                    break;
+                default:
+                    break;
+            }
+            break;
+    }
 }
 
 void field_update() {
@@ -28,7 +52,6 @@ void field_update() {
 }
 
 void receiver_thread() {
-    int started = 1;
     while(started) {
         Packet *p = net_receive_packet();
         if (p->packet_id == 3) {
@@ -37,7 +60,18 @@ void receiver_thread() {
     }
 }
 
-// TODO: split in files
+void sender_thread() {
+    while(started) {
+        while(!queue_empty(packets_send)) {
+            Packet *p = queue_pop(packets_send);
+            char *buf = (char*) p;
+            net_send_packet(buf, sizeof(Packet) + p->data_length);
+            free(buf);
+        }
+    }
+}
+
+// TODO: split in files & function naming???
 void field_parse(char* packet) {
     int id, a1, a2, a3, a4, pos;
     while(sscanf(packet, "%i:%i:%i:%i:%i:%n", &id, &a1, &a2, &a3, &a4, &pos) == 5) {

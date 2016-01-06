@@ -38,7 +38,7 @@ int net_server_start(uint16_t port) {
     }
     puts("net_server_start(): binding success");
 
-    Queue* receive = queue_create();
+    receive_packets = queue_create();
     net_client_descr_t clients[MAX_CONNECTIONS];
     clients_count = 0;
 
@@ -47,7 +47,6 @@ int net_server_start(uint16_t port) {
         pthread_t net_receive_thread, net_send_thread;
 
         clients[clients_count].socket = net_new_socket;
-        clients[clients_count].receive = receive;
         clients[clients_count].send = queue_create();
 
         // sending client his id
@@ -116,9 +115,8 @@ void *net_game_thread(net_client_descr_t *clients) {
     }
     
     while(net_server_status != SHUTDOWN) {
-        Queue* receive = clients[0].receive;
-        if (!queue_empty(receive)) {
-            Packet *p = queue_pop(receive);
+        if (!queue_empty(receive_packets)) {
+            Packet *p = queue_pop(receive_packets);
             game_packet_handle(p->packet_id, p->data, field);
             free(p);
         }
@@ -143,12 +141,16 @@ void *net_server_receive(void* args) {
     int sock = arguments->socket;
     char* client_reply = malloc(1024);
     while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
-        Packet* p = (Packet*) client_reply;
+        char* buffer = malloc(1024);
+        memcpy(buffer, client_reply, sizeof(Packet));
+        Packet* p = (Packet*) buffer;
         if (p->data_length != 0) {
             char* received_data = malloc(p->data_length);
             recv(sock, received_data, p->data_length, 0);
             strcpy(p->data, received_data);
-            queue_push(arguments->receive, p);
+            free(received_data);
+            queue_push(receive_packets, p);
+
         }
     }
     if (clients_count == 1) {
@@ -166,7 +168,7 @@ void *net_server_send(void* args) {
             char *buffer; // TODO: magic number?
             buffer = (char*) p;
             send(arguments->socket, buffer, sizeof(Packet) + p->data_length, 0);
-            free(p);
+            free(buffer);
         }
     }
 }

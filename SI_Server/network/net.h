@@ -1,6 +1,7 @@
 #ifndef NETWORK_NET_H
 #define NETWORK_NET_H
 #include <stdint.h>
+#include "../util/queue.h"
 
 #define MAX_CONNECTIONS 2
 
@@ -11,9 +12,10 @@ net_server_state net_server_status;
 
 typedef struct net_client_descr_t {
     int socket;
-    struct Queue *receive;
     struct Queue *send;
 } net_client_descr_t;
+
+Queue* receive_packets;
 
 int net_socket, net_new_socket, net_c, clients_count;
 

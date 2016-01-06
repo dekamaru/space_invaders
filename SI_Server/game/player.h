@@ -1,7 +1,7 @@
 #ifndef GAME_PLAYER_H
 #define GAME_PLAYER_H
 
-#define PLAYER_SPEED 1
+#define PLAYER_SPEED 5
 
 typedef struct Player {
     int x, y;

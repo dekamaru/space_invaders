@@ -2,6 +2,7 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void game_init(Field* field) {
     field->players[0] = player_create(32, WORLD_HEIGHT - 32);
@@ -19,9 +20,9 @@ void game_packet_handle(int packet_id, char* packet_data, Field *f) {
         case 4:
         {
             // PLAYER_MOVE (id player, direction)
-            //int player_id = packet_read_int(&packet_data);
-            //int direction = packet_read_int(&packet_data); TODO!!!
-            //player_move(&f->players[player_id], direction);
+            int player_id, direction;
+            sscanf(packet_data, "%i:%i", &player_id, &direction);
+            player_move(&f->players[player_id], direction);
         }
         break;
     }
