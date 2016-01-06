@@ -9,7 +9,7 @@ void game_init() {
     Packet *handshake = net_receive_packet();
     sscanf(handshake->data, "%i", &client_id);
     pthread_t wait_t;
-    pthread_create(&wait_t, NULL, game_wait_start, NULL);
+    pthread_create(&wait_t, NULL, (void*) game_wait_start, NULL);
 }
 
 void game_draw(void *renderer) {
@@ -30,5 +30,5 @@ void game_wait_start() {
     }
 }
 
-void game_update();
-void game_event(void *event);
+void game_update() {}
+void game_event(void *event) {}

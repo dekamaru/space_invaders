@@ -7,7 +7,7 @@
 #include "game.h"
 
 void field_init() {
-    players_count = 0; started = 1;
+    players_count = 0; started = 1; player_direction = -1;
     pthread_t receiver_t, sender_t;
     pthread_create(&receiver_t, NULL, receiver_thread, NULL);
     pthread_create(&sender_t, NULL, sender_thread, NULL);
@@ -27,23 +27,34 @@ void field_event(void *event) {
     Packet *p;
     switch(e->type) {
         case SDL_KEYDOWN:
-            // TODO: realize SDL_KEYUP velocity routines
             switch(e->key.keysym.sym) {
                 case SDLK_LEFT:
-                    // TODO: move to function
-                    sprintf(buffer, "%i:%i", client_id, 0);
-                    p = (Packet*) net_create_packet(4, 3, buffer);
-                    queue_push(packets_send, p);
+                    player_direction = 0;
                     break;
                 case SDLK_RIGHT:
-                    sprintf(buffer, "%i:%i", client_id, 1);
-                    p = (Packet*) net_create_packet(4, 3, buffer);
-                    queue_push(packets_send, p);
+                    player_direction = 1;
                     break;
                 default:
                     break;
             }
             break;
+        case SDL_KEYUP:
+            switch(e->key.keysym.sym) {
+                case SDLK_LEFT:
+                    if (player_direction == 0) player_direction = -1;
+                    break;
+                case SDLK_RIGHT:
+                    if (player_direction == 1) player_direction = -1;
+                    break;
+                default:
+                    break;
+            }
+            break;
+    }
+    if (player_direction != -1) {
+        sprintf(buffer, "%i:%i", client_id, player_direction);
+        p = (Packet*) net_create_packet(4, 3, buffer);
+        queue_push(packets_send, p);
     }
 }
 

@@ -17,7 +17,7 @@ void field_resolve_data(int id, int a1, int a2, int a3, int a4);
 void field_parse_packet(char* packet);
 
 Player *players[MAX_PLAYERS];
-int players_count, started;
+int players_count, started, player_direction;
 Queue* packets_send;
 
 #endif //SI_CLIENT_FIELD_H

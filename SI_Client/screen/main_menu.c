@@ -99,4 +99,4 @@ void main_menu_select() {
     }
 }
 
-void main_menu_update();
+void main_menu_update() {}

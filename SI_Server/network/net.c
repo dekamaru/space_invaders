@@ -165,7 +165,7 @@ void *net_server_send(void* args) {
     while(net_server_status != SHUTDOWN) {
         if (!queue_empty(arguments->send)) {
             Packet *p = queue_pop(arguments->send);
-            char *buffer; // TODO: magic number?
+            char *buffer;
             buffer = (char*) p;
             send(arguments->socket, buffer, sizeof(Packet) + p->data_length, 0);
             free(buffer);
