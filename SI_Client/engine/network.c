@@ -1,10 +1,5 @@
-//
-// Created by dekamaru on 04.01.16.
-//
-
 #include <stdint.h>
 #include <sys/socket.h>
-#include <stdio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>

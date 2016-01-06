@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 04.01.16.
-//
-
 #ifndef SI_CLIENT_ASSETS_H
 #define SI_CLIENT_ASSETS_H
 

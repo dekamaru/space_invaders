@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 04.01.16.
-//
-
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 

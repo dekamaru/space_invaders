@@ -7,15 +7,11 @@
 #include "player.h"
 #include "../engine/engine.h"
 
-Player *player_load(int x, int y, int lives, int score) {
-    Player* p = malloc(sizeof(Player));
+void player_update(Player *p, int x, int y, int lives, int score) {
     p->x = x;
     p->y = y;
     p->lives = lives;
     p->score = score;
-    p->width = 32;
-    p->height = 32;
-    return p;
 }
 
 void player_render(Player *p) {
@@ -27,4 +23,11 @@ void player_render(Player *p) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &player);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+}
+
+Player* player_create() {
+    Player* p = malloc(sizeof(Player));
+    p->width = 32;
+    p->height = 32;
+    return p;
 }

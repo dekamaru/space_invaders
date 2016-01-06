@@ -27,13 +27,10 @@ void main_menu_init() {
 void main_menu_draw() {
     SDL_Color white = {255, 255, 255, 255};
     font_render("Space Invaders", 0, 50, 1, assets_bundle->fonts[0], white);
-    main_draw_menu(menu_part);
+    main_render_menu(menu_part);
 }
 
-void main_menu_update() {
-}
-
-void main_draw_menu(int menu_part) {
+void main_render_menu(int menu_part) {
     SDL_Color white = {255, 255, 255, 255};
     SDL_Color red = {255, 0, 0, 255};
     for(int i = 0; i < menus[menu_part].items_count; i++) {
@@ -75,6 +72,7 @@ void main_menu_event(void* event) {
 }
 
 void main_menu_connect() {
+    // TODO: create connect gui
     if (net_client_connect("127.0.0.1", 26000) == 0) {
         menu_part = 1;
     } else {
@@ -85,22 +83,20 @@ void main_menu_connect() {
 void main_menu_select() {
     switch(menu_part) {
         case 0:
-            // select in main menu
             if (menu_pointer == 0) {
-                // start game
                 main_menu_connect();
             } else {
-                // exit
                 E_Shutdown();
             }
             break;
         case 1:
-            // select in connection failed
             if (menu_pointer == 0) {
                 main_menu_connect();
             } else {
-                menu_part = 0; // back to main
+                menu_part = 0;
             }
             break;
     }
 }
+
+void main_menu_update();

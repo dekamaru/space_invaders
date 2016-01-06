@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 02.01.16.
-//
-
 #ifndef SI_CLIENT_FONT_H
 #define SI_CLIENT_FONT_H
 

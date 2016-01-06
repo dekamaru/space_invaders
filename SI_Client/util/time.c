@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 05.01.16.
-//
-
 #include <stddef.h>
 #include <sys/time.h>
 #include "time.h"

@@ -17,10 +17,9 @@ void main_menu_draw();
 void main_menu_event(void* event);
 void main_menu_update();
 void main_menu_select();
-void main_draw_menu(int menu_part);
+void main_render_menu(int menu_part);
 void main_menu_connect();
 
-// Menu purposes
 int menu_pointer;
 int menu_part;
 

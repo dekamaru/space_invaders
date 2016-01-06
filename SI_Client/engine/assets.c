@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 04.01.16.
-//
-
 #include "assets.h"
 
 void assets_load_font(Assets *bundle, char *font_file, int ptsize) {

@@ -15,5 +15,5 @@ void renderer_set_padding(SDL_Rect *r, int padding) {
 void renderer_draw_rect(SDL_Rect *r, SDL_Color color) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderDrawRect(renderer, r);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // return back
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 }

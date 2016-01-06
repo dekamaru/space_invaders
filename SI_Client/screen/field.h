@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 05.01.16.
-//
-
 #ifndef SI_CLIENT_FIELD_H
 #define SI_CLIENT_FIELD_H
 
@@ -16,8 +12,9 @@ void field_event(void *event);
 void field_update();
 void receiver_thread();
 void sender_thread();
-void packet_resolve_data(int id, int a1, int a2, int a3, int a4);
-void field_parse(char* packet);
+
+void field_resolve_data(int id, int a1, int a2, int a3, int a4);
+void field_parse_packet(char* packet);
 
 Player *players[MAX_PLAYERS];
 int players_count, started;

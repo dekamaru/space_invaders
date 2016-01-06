@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 02.01.16.
-//
-
 #include <SDL2/SDL_ttf.h>
 #include "font.h"
 #include "../engine/engine.h"

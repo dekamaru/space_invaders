@@ -12,7 +12,8 @@ typedef struct Player {
     int width, height;
 } Player;
 
-Player* player_load(int x, int y, int lives, int score);
-void player_render(Player* p);
+Player* player_create();
+void player_update(Player *p, int x, int y, int lives, int score);
+void player_render(Player *p);
 
 #endif //SI_CLIENT_PLAYER_H
