@@ -23,3 +23,4 @@ set(SOURCE_FILES
         main.c util/time.c util/time.h)
 
 add_executable(SI_Server ${SOURCE_FILES})
+add_custom_target(valgrind /usr/bin/valgrind ${PROJECT_BINARY_DIR}/SI_Server)

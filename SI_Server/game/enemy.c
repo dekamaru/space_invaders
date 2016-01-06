@@ -3,17 +3,15 @@
 #include <time.h>
 #include <stdlib.h>
 
-Enemy enemy_spawn(int type) {
+void enemy_spawn(Enemy *e, int type) {
     srand(time(NULL)); // TODO: not use rand, get coords from game
-    Enemy e;
-    e.x = rand() % WORLD_WIDTH;
-    e.y = -20; // hiding from screen
-    e.type = type;
-    e.alive = 1;
-    e.health = 100;
-    e.speed = 1; // speed?
-    e.width = e.height = 32;
-    return e;
+    e->x = rand() % WORLD_WIDTH;
+    e->y = -10; // hiding from screen
+    e->type = type;
+    e->alive = 1;
+    e->health = 100;
+    e->speed = 3; // speed?
+    e->width = e->height = 32;
 }
 
 void enemy_shoot() {

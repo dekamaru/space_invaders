@@ -22,25 +22,23 @@ int net_client_connect(char* addr, uint16_t port) {
 }
 
 Packet *net_receive_packet() {
-    char* server_reply = malloc(1024);
-    if(recv(net_socket, server_reply, sizeof(Packet), 0) == sizeof(Packet)) {
-        Packet* p = (Packet*) server_reply;
+    char *server_reply = malloc(512);
+    if (recv(net_socket, server_reply, sizeof(Packet), 0) == sizeof(Packet)) {
+        char *buffer = malloc(512);
+        memcpy(buffer, server_reply, sizeof(Packet));
+        Packet *p = (Packet *) buffer;
         if (p->data_length != 0) {
-            char* received_data = malloc(p->data_length);
+            char *received_data = malloc(p->data_length);
             recv(net_socket, received_data, p->data_length, 0);
-            received_data[p->data_length] = 0;
             strcpy(p->data, received_data);
+            free(received_data);
             return p;
-        } else {
-            return NULL;
         }
-    } else {
-        return NULL;
     }
 }
 
 char* net_create_packet(uint32_t packet_id, uint32_t data_length, char* data) {
-    char* buffer = malloc(1024);
+    char* buffer = malloc(512);
     Packet *p = (Packet*) buffer;
     p->packet_id = packet_id;
     p->data_length = data_length;

@@ -15,8 +15,7 @@ int packer_pack_gameobject(char* buffer, GameObject* go) {
     return sprintf(buffer, "%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, 0); // last argument - padding for other packs;
 }
 
-char* packer_pack_field(Field *f) {
-    char* buffer = malloc(4096);
+void packer_pack_field(char* buffer, Field *f) {
     int size = 0, offset = 0;
     for(int i = 0; i < MAX_PLAYERS; i++) {
         offset = packer_pack_player(buffer, &f->players[i]);
@@ -37,5 +36,5 @@ char* packer_pack_field(Field *f) {
             size += offset;
         }
     }
-    return buffer - size;
+    buffer -= size;
 }

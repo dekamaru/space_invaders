@@ -2,7 +2,7 @@
 #define UTIL_QUEUE_H
 
 typedef struct Node {
-    struct Packet* data;
+    void *data;
     struct Node *next;
 } Node;
 
@@ -13,8 +13,8 @@ typedef struct Queue {
 } Queue;
 
 Queue* queue_create();
-void queue_push(Queue* q, struct Packet* value);
-struct Packet* queue_pop(Queue* q);
+void queue_push(Queue* q, void *value);
+void* queue_pop(Queue* q);
 int queue_empty(Queue* q);
 int queue_size(Queue* q);
 

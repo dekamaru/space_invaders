@@ -10,7 +10,6 @@ void game_init(Field* field) {
 }
 
 void game_update(Field* field) {
-    srand(time(NULL));
     game_update_gameobjects(field);
     game_update_enemies(field);
 }
@@ -41,6 +40,7 @@ void game_update_gameobjects(Field* field) {
 }
 
 void game_update_enemies(Field* field) {
+    srand(time(NULL));
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (field->enemies[i].alive == 1) {
             enemy_move(&field->enemies[i]);
@@ -49,6 +49,8 @@ void game_update_enemies(Field* field) {
             }
             if(field->enemies[i].y > WORLD_HEIGHT) {
                 field->enemies[i].alive = 0;
+                printf("Enemy destroyed at index: %i\n", i);
+                fflush(stdout);
             }
             // TODO: CHECK COLISSION WITH PLAYER
 
@@ -56,10 +58,12 @@ void game_update_enemies(Field* field) {
     }
 
     if (field_enemies_count(field) < MAX_SPAWNED_ENEMIES) {
-        if (rand() % 1000 == ENEMY_SPAWN_CHANCE) {
+        int random = rand() % 5;
+        if (random == ENEMY_SPAWN_CHANCE) {
             int write_index = field_enemies_find_space(field);
             if (write_index != -1) {
-                field->enemies[write_index] = enemy_spawn(1);
+                printf("Enemy spawned at index: %i\n", write_index);
+                enemy_spawn(&field->enemies[write_index], 1);
             }
         }
     }

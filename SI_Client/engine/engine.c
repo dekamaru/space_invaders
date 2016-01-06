@@ -26,6 +26,7 @@ int E_Init() {
     assets_load_font(assets_bundle, "assets/font.ttf", 36);
     assets_load_font(assets_bundle, "assets/font.ttf", 24);
     assets_load_font(assets_bundle, "assets/font.ttf", 18);
+    assets_load_font(assets_bundle, "assets/font.ttf", 12);
 
     // ALL THINGS DONE, GO TO MAIN MENU
     switch_screen(1);

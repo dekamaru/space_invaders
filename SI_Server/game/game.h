@@ -9,7 +9,7 @@
 #define WORLD_WIDTH 640
 #define WORLD_HEIGHT 480
 #define MAX_SPAWNED_ENEMIES 10
-#define ENEMY_SPAWN_CHANCE 50 // 0 - 1000
+#define ENEMY_SPAWN_CHANCE 4
 #define ENEMY_SHOOT_CHANCE 200 // 0 - 1000
 
 void game_init(Field* field); // field
