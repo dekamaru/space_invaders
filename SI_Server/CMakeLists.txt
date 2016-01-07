@@ -18,9 +18,7 @@ set(SOURCE_FILES
         network/packer.h
         network/packet.c
         network/packet.h
-        util/queue.c
-        util/queue.h
-        main.c util/time.c util/time.h)
+        main.c util/time.c util/time.h util/queue.c util/queue.h)
 
 add_executable(SI_Server ${SOURCE_FILES})
 add_custom_target(valgrind /usr/bin/valgrind ${PROJECT_BINARY_DIR}/SI_Server)

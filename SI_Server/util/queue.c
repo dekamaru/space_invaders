@@ -1,49 +1,42 @@
+//
+// Created by dekamaru on 07.01.16.
+//
+
+#include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "queue.h"
 
-Queue* queue_create() {
+Queue *queue_create() {
     Queue* q = malloc(sizeof(Queue));
-    q->first = q->last = NULL;
-    q->size = 0;
+    q->front = 0;
+    q->count = 0;
     return q;
 }
 
-void queue_push(Queue* q, void *value) {
-    Node* t = malloc(sizeof(Node));
-    t->data = value;
-    t->next = NULL;
-    if (q->first == NULL && q->last == NULL) {
-        q->first = q->last = t;
-    } else {
-        q->last->next = t;
-        q->last = t;
+void queue_push(Queue *q, Packet *value) {
+    if (q->count >= MAX_QUEUE_SIZE) {
+        fprintf(stderr, "Queue is full.\n");
+        exit(666);  /* Exit program, returning error code. */
     }
-    q->size++;
+    int newElementIndex = (q->front + q->count) % MAX_QUEUE_SIZE;
+    q->queue_array[newElementIndex] = value;
+    q->count++;
 }
 
-void* queue_pop(Queue* q) {
-    if (q->first == NULL && q->last == NULL) {
-        return 0;
+
+Packet* queue_pop(Queue *q) {
+    if (q->count <= 0) {
+        fprintf(stderr, "Delete attempt on empty queue!.\n");
+        exit(666);
     }
-    void *result = q->first->data;
-    Node* h = NULL;
-    Node* p = NULL;
-    h = q->first;
-    p = h->next;
-    free(h);
-    q->first = p;
-    if (q->first == NULL) {
-        q->last = q->first;
-    }
-    q->size--;
-    return result;
+    Packet *to_return = q->queue_array[q->front];
+    q->front++;
+    q->front %= MAX_QUEUE_SIZE;
+    q->count--;
+    return to_return;
 }
 
-int queue_empty(Queue* q) {
-    if(q->size == 0) return 1;
-    return 0;
-}
-
-int queue_size(Queue* q) {
-    return q->size;
+int queue_empty(Queue *q) {
+    return (q->count == 0);
 }

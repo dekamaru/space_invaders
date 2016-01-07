@@ -1,11 +1,13 @@
 #ifndef SI_CLIENT_FIELD_H
 #define SI_CLIENT_FIELD_H
 
+#include <SDL2/SDL_rect.h>
 #include "../game/player.h"
 #include "../util/queue.h"
 #include "../game/enemy.h"
 
 #define MAX_PLAYERS 2
+#define MAX_ENEMIES 30
 
 void field_init();
 void field_draw(void *renderer);
@@ -20,5 +22,6 @@ Player *players[MAX_PLAYERS];
 int players_count, started, player_direction;
 Queue* packets_send;
 Queue* enemies;
+SDL_Rect* bounds;
 
 #endif //SI_CLIENT_FIELD_H

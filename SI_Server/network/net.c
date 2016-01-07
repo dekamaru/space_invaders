@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "packet.h"
 #include "net.h"
@@ -15,6 +16,15 @@
 #include "../util/time.h"
 
 struct sockaddr_in net_server, net_client;
+/**
+ * This handler needs to stabilize closing server
+ */
+void sigpipe_handler() {
+    net_server_status = SHUTDOWN;
+    // Sigpipe catched
+    close(net_socket);
+    exit(0);
+}
 
 int net_port_bind(uint16_t port) {
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -30,13 +40,13 @@ int net_port_bind(uint16_t port) {
     }
     return 1;
 }
-
 int net_server_start(uint16_t port) {
     if (net_port_bind(port) == 0) {
         puts("net_server_start(): bind fail!");
         return 0;
     }
     puts("net_server_start(): binding success");
+    signal(SIGPIPE, sigpipe_handler); // enable catcher
 
     net_client_descr_t clients[MAX_CONNECTIONS];
     clients_count = 0;
@@ -65,25 +75,6 @@ int net_server_start(uint16_t port) {
     net_server_status = RUNNING;
 
     pthread_join(game_thread, NULL); //waiting the game shutdown
-}
-
-int net_client_connect(char* addr, uint16_t port) {
-    net_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (net_socket == -1) {
-        puts("net_client_connect(): socket creating fail!");
-        net_status = DISCONNECTED;
-        return 0;
-    }
-    net_server.sin_addr.s_addr = inet_addr(addr);
-    net_server.sin_family = AF_INET;
-    net_server.sin_port = htons(port);
-    if(connect(net_socket, (struct sockaddr *)&net_server, sizeof(net_server)) < 0) {
-        puts("net_client_connect(): connection failed");
-        net_status = DISCONNECTED;
-        return 0;
-    }
-    net_status = CONNECTED;
-    return 1;
 }
 
 void *net_game_thread(net_client_descr_t *clients) {
@@ -137,7 +128,7 @@ void *net_server_receive(void* args) {
     if (clients_count == 1) {
         clients_count--;
     }
-    shutdown(arguments->socket, 2);
+    close(arguments->socket);
     return 0;
 }
 

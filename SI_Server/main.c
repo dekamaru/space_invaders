@@ -2,7 +2,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <sys/socket.h>
+#include <unistd.h>
 #include "network/net.h"
 
 void command_input_handler() {
@@ -11,7 +11,7 @@ void command_input_handler() {
     while(1) {
         scanf("%s", &command);
         if (strcmp(command, "shutdown") == 0) {
-            shutdown(net_socket, 1);
+            close(net_socket);
             exit(0);
         }
     }
