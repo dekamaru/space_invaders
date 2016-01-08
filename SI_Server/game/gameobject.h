@@ -1,6 +1,8 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
+#include "player.h"
+
 typedef struct GameObject {
     int x, y;
     int width, height;
@@ -11,5 +13,5 @@ typedef struct GameObject {
 } GameObject;
 
 void gameobject_move(GameObject* go);
-
+void gameobject_spawn(GameObject *go, Player *p, int owner, int type);
 #endif // GAME_OBJECT_H

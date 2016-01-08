@@ -14,3 +14,10 @@ int field_enemies_find_space(Field *f) {
     }
     return -1;
 }
+
+int field_gameobjects_find_space(Field *f) {
+    for(int i = 0; i < MAX_OBJECTS; i++) {
+        if (f->objects[i].alive == 0) return i;
+    }
+    return -1;
+}

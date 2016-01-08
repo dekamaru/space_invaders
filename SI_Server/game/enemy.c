@@ -3,14 +3,20 @@
 #include <time.h>
 #include <stdlib.h>
 
-void enemy_spawn(Enemy *e, int type) {
-    srand(time(NULL)); // TODO: not use rand, get coords from game
-    e->x = rand() % WORLD_WIDTH;
+int old_x = 0;
+
+void enemy_spawn(Enemy *e, int type, int x) {
+    if (x == old_x) { // Prevent spawning at equal x
+        e->x = 32 + (rand() % WORLD_WIDTH - 32);
+    } else {
+        e->x = x;
+    }
+    old_x = x;
     e->y = -10; // hiding from screen
     e->type = type;
     e->alive = 1;
     e->health = 100;
-    e->speed = 3; // speed?
+    e->speed = 3;
     e->width = e->height = 32;
 }
 

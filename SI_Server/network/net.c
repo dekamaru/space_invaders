@@ -9,22 +9,13 @@
 
 #include "packet.h"
 #include "net.h"
-#include "../util/queue.h"
 
 #include "../game/game.h"
 #include "packer.h"
 #include "../util/time.h"
 
 struct sockaddr_in net_server, net_client;
-/**
- * This handler needs to stabilize closing server
- */
-void sigpipe_handler() {
-    net_server_status = SHUTDOWN;
-    // Sigpipe catched
-    close(net_socket);
-    exit(0);
-}
+int yes = 1;
 
 int net_port_bind(uint16_t port) {
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -35,6 +26,7 @@ int net_port_bind(uint16_t port) {
     net_server.sin_family = AF_INET;
     net_server.sin_addr.s_addr = INADDR_ANY;
     net_server.sin_port = htons(port);
+    setsockopt(net_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     if (bind(net_socket, (struct sockaddr*)&net_server, sizeof(net_server)) < 0) {
         return 0;
     }
@@ -46,7 +38,6 @@ int net_server_start(uint16_t port) {
         return 0;
     }
     puts("net_server_start(): binding success");
-    signal(SIGPIPE, sigpipe_handler); // enable catcher
 
     net_client_descr_t clients[MAX_CONNECTIONS];
     clients_count = 0;
@@ -75,13 +66,14 @@ int net_server_start(uint16_t port) {
     net_server_status = RUNNING;
 
     pthread_join(game_thread, NULL); //waiting the game shutdown
+    return 1;
 }
 
 void *net_game_thread(net_client_descr_t *clients) {
     net_field = malloc(sizeof(Field));
     char* field_buffer = malloc(512);
     game_init(net_field);
-
+    signal(SIGPIPE, (__sighandler_t) sigpipe_handler); // enable catcher
     // Limit loop to 30 fps
     const int FRAMES_PER_SECOND = 30;
     const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
@@ -144,4 +136,16 @@ void *net_server_send(void* args) {
             }
         }
     }
+}
+
+/**
+ * This handler needs to stabilize closing server
+ */
+void sigpipe_handler(int signal) {
+    net_server_status = SHUTDOWN;
+    // Sigpipe catched
+    close(net_socket);
+    printf("[Server] Client disconnected from server, shutting down.\n");
+    fflush(stdout);
+    exit(0);
 }

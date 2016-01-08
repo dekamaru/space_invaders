@@ -4,6 +4,14 @@
 #include "../util/font.h"
 #include "../engine/engine.h"
 #include "game.h"
+#include "../game/gameobject.h"
+
+Player *players[MAX_PLAYERS];
+int players_count, started, player_direction;
+Queue* packets_send;
+Queue* enemies;
+Queue* gameobjects;
+SDL_Rect* bounds;
 
 void field_init() {
     // Init global variables
@@ -12,10 +20,11 @@ void field_init() {
 
     // Creating send packets queue
     packets_send = queue_create();
+    gameobjects = queue_create();
+    enemies = queue_create();
 
     // Allocate memory for game entities
     for(int i = 0; i < MAX_PLAYERS; i++) players[i] = player_create();
-    enemies = queue_create();
 
     // Init send & receive threads
     pthread_t receiver_t, sender_t;
@@ -25,12 +34,24 @@ void field_init() {
 
 void field_draw(void *renderer) {
     SDL_Color w = {255, 255, 255, 255};
-    font_render("SI alpha v 0.1 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
+    font_render("SI alpha v 0.2 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
+    char* info = malloc(20);
+    sprintf(info, "Lives: %i", players[client_id]->lives);
+    font_render(info, 0, 20, 0, assets_bundle->fonts[2], w);
+    sprintf(info, "Score: %i", players[client_id]->score);
+    font_render(info, 0, 40, 0, assets_bundle->fonts[2], w);
+    free(info);
+    // TODO: fix stun player if shooting & moving
     for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i]);
     while (!queue_empty(enemies)) {
         Enemy *e = queue_pop(enemies);
         enemy_render(e, bounds);
         free(e);
+    }
+    while (!queue_empty(gameobjects)) {
+        GameObject *go = queue_pop(gameobjects);
+        go_render(go, bounds);
+        free(go);
     }
 }
 
@@ -58,6 +79,11 @@ void field_event(void *event) {
                     break;
                 case SDLK_RIGHT:
                     if (player_direction == 1) player_direction = -1;
+                    break;
+                case SDLK_SPACE:
+                    sprintf(buffer, "%i", client_id);
+                    Packet *s = (Packet*) net_create_packet(5, 1, buffer);
+                    queue_push(packets_send, s);
                     break;
                 default:
                     break;
@@ -117,6 +143,10 @@ void field_resolve_data(int id, int a1, int a2, int a3, int a4) {
         case 2:
             // Enemy field data
             queue_push(enemies, enemy_dump(a1, a2, a3, a4));
+            break;
+        case 3:
+            // Gameobject field data
+            queue_push(gameobjects, go_dump(a1, a2, a3));
             break;
         default:
             break;

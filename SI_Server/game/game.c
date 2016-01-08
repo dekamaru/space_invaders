@@ -15,13 +15,23 @@ void game_update(Field* field) {
 }
 
 void game_packet_handle(int packet_id, char* packet_data, Field *f) {
+    int player_id;
     switch(packet_id) {
         case 4:
         {
             // PLAYER_MOVE (id player, direction)
-            int player_id, direction;
+            int direction;
             sscanf(packet_data, "%i:%i", &player_id, &direction);
             player_move(&f->players[player_id], direction);
+        }
+        break;
+        case 5: {
+            sscanf(packet_data, "%i", &player_id);
+            int index = field_gameobjects_find_space(f);
+            if (index != -1) {
+                gameobject_spawn(&f->objects[index], &f->players[player_id], 1, 1); // spawn bullet
+            }
+
         }
         break;
     }
@@ -31,7 +41,7 @@ void game_update_gameobjects(Field* field) {
     for(int i = 0; i < MAX_OBJECTS; i++) {
         if (field->objects[i].alive == 1) {
             gameobject_move(&field->objects[i]); // update coords
-            if (field->objects[i].y > WORLD_HEIGHT) { // if out of screen
+            if (field->objects[i].y > WORLD_HEIGHT || field->objects[i].y < 0) { // if out of screen
                 field->objects[i].alive = 0; // destroy object
             }
             // TODO: CHECK COLISSIONS!
@@ -49,8 +59,6 @@ void game_update_enemies(Field* field) {
             }
             if(field->enemies[i].y > WORLD_HEIGHT) {
                 field->enemies[i].alive = 0;
-                printf("Enemy destroyed at index: %i\n", i);
-                fflush(stdout);
             }
             // TODO: CHECK COLISSION WITH PLAYER
 
@@ -58,12 +66,12 @@ void game_update_enemies(Field* field) {
     }
 
     if (field_enemies_count(field) < MAX_SPAWNED_ENEMIES) {
-        int random = rand() % 5;
-        if (random == ENEMY_SPAWN_CHANCE) {
+        if (rand() % 5 == ENEMY_SPAWN_CHANCE) {
             int write_index = field_enemies_find_space(field);
             if (write_index != -1) {
-                printf("Enemy spawned at index: %i\n", write_index);
-                enemy_spawn(&field->enemies[write_index], 1);
+                int x = rand() % WORLD_WIDTH - 32;
+                if (x == 0) x += 32;
+                enemy_spawn(&field->enemies[write_index], 1, x);
             }
         }
     }

@@ -10,7 +10,7 @@ typedef struct Enemy {
     int alive;
 } Enemy;
 
-void enemy_spawn(Enemy *e, int type);
+void enemy_spawn(Enemy *e, int type, int x);
 void enemy_shoot();
 void enemy_move(Enemy *e);
 
