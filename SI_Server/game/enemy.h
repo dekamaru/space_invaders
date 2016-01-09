@@ -11,7 +11,6 @@ typedef struct Enemy {
 } Enemy;
 
 void enemy_spawn(Enemy *e, int type, int x);
-void enemy_shoot();
 void enemy_move(Enemy *e);
 
 #endif // GAME_ENEMY_H

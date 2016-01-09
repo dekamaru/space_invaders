@@ -1,5 +1,6 @@
 #include "game.h"
 #include "../util/time.h"
+#include "rectangle.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -42,10 +43,37 @@ void game_update_gameobjects(Field* field) {
     for(int i = 0; i < MAX_OBJECTS; i++) {
         if (field->objects[i].alive == 1) {
             gameobject_move(&field->objects[i]); // update coords
-            if (field->objects[i].y > WORLD_HEIGHT || field->objects[i].y < 0) { // if out of screen
+            if (field->objects[i].y > WORLD_HEIGHT || field->objects[i].y < -10) { // if out of screen
                 field->objects[i].alive = 0; // destroy object
             }
-            // TODO: CHECK COLISSIONS!
+            Rectangle go = gameobject_rectangle(&field->objects[i]);
+
+            // COLLISION WITH ENEMIES
+            for(int j = 0; j < MAX_ENEMIES; j++) {
+                if (field->enemies[j].alive == 1) {
+                    Rectangle enemy = enemy_rectangle(&field->enemies[j]);
+                    if (rectangle_collide(&go, &enemy)) {
+                        if (field->objects[i].owner != 2) {
+                            field->objects[i].alive = 0; // destroy go
+                            field->enemies[j].alive = 0; // destroy enemy
+                            Player *a = field->objects[i].author;
+                            a->score += 100;
+                        }
+                    }
+                }
+            }
+
+            // COLLISION WITH PLAYERS
+            for(int j = 0; j < MAX_PLAYERS; j++) {
+                Rectangle player = player_rectangle(&field->players[j]);
+                if (rectangle_collide(&go, &player)) {
+                    if (field->objects[i].owner == 2) {
+                        field->objects[i].alive = 0;
+                        field->players[j].lives--;
+                    }
+                }
+            }
+
         }
     }
 }
@@ -54,13 +82,25 @@ void game_update_enemies(Field* field) {
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (field->enemies[i].alive == 1) {
             enemy_move(&field->enemies[i]);
-            if (rand() % 1000 == ENEMY_SHOOT_CHANCE) {
-                //enemy_shoot(); // TODO: release that
+            if (rand() % 100 == ENEMY_SHOOT_CHANCE) {
+                int index = field_gameobjects_find_space(field);
+                if (index != -1) {
+                    gameobject_spawn(&field->objects[index], &field->enemies[i], 2, 1); // spawn bullet
+                }
             }
             if(field->enemies[i].y > WORLD_HEIGHT) {
                 field->enemies[i].alive = 0;
             }
-            // TODO: CHECK COLISSION WITH PLAYER
+            Rectangle enemy = enemy_rectangle(&field->enemies[i]);
+
+            // COLLISION WITH PLAYERS
+            for(int j = 0; j < MAX_PLAYERS; j++) {
+                Rectangle player = player_rectangle(&field->players[j]);
+                if (rectangle_collide(&enemy, &player)) {
+                    field->enemies[i].alive = 0;
+                    field->players[j].lives--;
+                }
+            }
 
         }
     }

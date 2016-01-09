@@ -10,8 +10,9 @@ typedef struct GameObject {
     int type; // bullet - 1, etc...
     int owner; // 1 - player, 2 - enemy, 3 - etc...
     int speed;
+    void* author;
 } GameObject;
 
 void gameobject_move(GameObject* go);
-void gameobject_spawn(GameObject *go, Player *p, int owner, int type);
+void gameobject_spawn(GameObject *go, void* p, int owner, int type);
 #endif // GAME_OBJECT_H

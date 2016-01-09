@@ -74,12 +74,6 @@ void *net_game_thread(net_client_descr_t *clients) {
     char* field_buffer = malloc(512);
     game_init(net_field);
 
-    // Limit loop to 30 fps
-    const int FRAMES_PER_SECOND = 30;
-    const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
-    unsigned long next_game_tick = time_get_tick();
-    unsigned long sleep_time = 0;
-
     for(int i = 0; i < MAX_CONNECTIONS; i++) {
         // sending packet 2 (game start)
         Packet *p = (Packet*) packet_create(2, 1, "1");
@@ -91,13 +85,7 @@ void *net_game_thread(net_client_descr_t *clients) {
         packer_pack_field(field_buffer, net_field);
         Packet* p = (Packet*) packet_create(3, strlen(field_buffer), field_buffer);
         for(int i = 0; i < MAX_CONNECTIONS; i++) queue_push(clients[i].send, p);
-
-        // Limiting loop
-        next_game_tick += SKIP_TICKS;
-        sleep_time = next_game_tick - time_get_tick();
-        if(sleep_time >= 0) {
-            usleep(sleep_time);
-        }
+        usleep(30000);
     }
 }
 

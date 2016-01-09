@@ -1,4 +1,5 @@
 #include "gameobject.h"
+#include "enemy.h"
 
 void gameobject_move(GameObject* go) {
     if (go->owner == 1) {
@@ -8,7 +9,7 @@ void gameobject_move(GameObject* go) {
     }
 }
 
-void gameobject_spawn(GameObject *go, Player* p, int owner, int type) {
+void gameobject_spawn(GameObject *go, void* p, int owner, int type) {
     switch(type) {
         case 1:
             // bullet
@@ -18,10 +19,23 @@ void gameobject_spawn(GameObject *go, Player* p, int owner, int type) {
             go->width = go->height = 32;
             break;
     }
+    switch(owner) {
+        case 1: {
+            Player *o = (Player *) p;
+            go->x = o->x + 8;
+            go->y = o->y;
+        }
+            break;
+        case 2: {
+            Enemy *o = (Enemy * ) p;
+            go->x = o->x + 8;
+            go->y = o->y;
+            break;
+        }
+    }
+    go->author = p;
     go->type = type;
     go->owner = owner;
     go->alive = 1;
-    go->x = p->x + 8; // center at object
-    go->y = p->y;
     go->speed = 6;
 }
