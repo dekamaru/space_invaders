@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "field.h"
 #include "../util/font.h"
 #include "../engine/engine.h"
@@ -45,8 +46,9 @@ void field_init() {
 }
 
 void field_draw(void *renderer) {
+
     SDL_Color w = {255, 255, 255, 255};
-    font_render("SI alpha v 0.2 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
+    font_render("SI alpha v 0.3 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
     char* info = malloc(20);
     sprintf(info, "Lives: %i", players[client_id]->lives);
     font_render(info, 0, 20, 0, assets_bundle->fonts[2], w);
@@ -167,7 +169,7 @@ void field_resolve_data(int id, int a1, int a2, int a3, int a4) {
             break;
         case 3:
             // Gameobject field data
-            queue_push(gameobjects, go_dump(a1, a2, a3));
+            queue_push(gameobjects, go_dump(a1, a2, a3, a4));
             break;
         default:
             break;

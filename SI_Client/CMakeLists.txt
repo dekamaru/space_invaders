@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 project(SI_Client)
-link_libraries(SDL2 SDL2_ttf pthread)
+link_libraries(SDL2 SDL2_ttf SDL2_image pthread)
 set(SOURCE_FILES
         engine/engine.c
         engine/engine.h

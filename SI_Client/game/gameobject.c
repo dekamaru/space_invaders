@@ -7,7 +7,7 @@
 #include "gameobject.h"
 #include "../engine/engine.h"
 
-GameObject *go_dump(int x, int y, int type) {
+GameObject *go_dump(int x, int y, int type, int owner) {
     GameObject *go = malloc(sizeof(GameObject));
     switch(type) {
         case 1:
@@ -19,6 +19,7 @@ GameObject *go_dump(int x, int y, int type) {
             break;
     }
     go->type = type;
+    go->owner = owner;
     go->x = x;
     go->y = y;
     return go;
@@ -29,7 +30,5 @@ void go_render(GameObject *go, SDL_Rect *bounds) {
     bounds->y = go->y;
     bounds->w = go->width;
     bounds->h = go->height;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, bounds);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderCopy(renderer, assets_bundle->images[go->owner], NULL, bounds);
 }

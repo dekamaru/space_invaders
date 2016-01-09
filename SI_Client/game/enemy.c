@@ -24,9 +24,7 @@ void enemy_render(Enemy *e, SDL_Rect *bounds) {
     bounds->y = e->y;
     bounds->w = e->width;
     bounds->h = e->height;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, bounds);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderCopy(renderer, assets_bundle->images[3], NULL, bounds);
 }
 
 Enemy *enemy_dump(int x, int y, int type, int health) {

@@ -20,9 +20,7 @@ void player_render(Player *p) {
     player.y = p->y;
     player.w = p->width;
     player.h = p->height;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &player);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderCopy(renderer, assets_bundle->images[0], NULL, &player);
 }
 
 Player* player_create() {
