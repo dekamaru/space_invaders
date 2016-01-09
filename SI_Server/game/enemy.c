@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "game.h"
+#include "../util/time.h"
 #include <time.h>
 #include <stdlib.h>
 
@@ -7,7 +8,7 @@ int old_x = 0;
 
 void enemy_spawn(Enemy *e, int type, int x) {
     if (x == old_x) { // Prevent spawning at equal x
-        e->x = 32 + (rand() % WORLD_WIDTH - 32);
+        e->x = rand_between(32, WORLD_WIDTH - 32);
     } else {
         e->x = x;
     }

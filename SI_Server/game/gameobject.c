@@ -23,5 +23,5 @@ void gameobject_spawn(GameObject *go, Player* p, int owner, int type) {
     go->alive = 1;
     go->x = p->x + 8; // center at object
     go->y = p->y;
-    go->speed = 4;
+    go->speed = 6;
 }

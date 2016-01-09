@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../util/time.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -50,7 +51,6 @@ void game_update_gameobjects(Field* field) {
 }
 
 void game_update_enemies(Field* field) {
-    srand(time(NULL));
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (field->enemies[i].alive == 1) {
             enemy_move(&field->enemies[i]);
@@ -66,11 +66,10 @@ void game_update_enemies(Field* field) {
     }
 
     if (field_enemies_count(field) < MAX_SPAWNED_ENEMIES) {
-        if (rand() % 5 == ENEMY_SPAWN_CHANCE) {
+        if (rand() % 50 == ENEMY_SPAWN_CHANCE) {
             int write_index = field_enemies_find_space(field);
             if (write_index != -1) {
-                int x = rand() % WORLD_WIDTH - 32;
-                if (x == 0) x += 32;
+                int x = rand_between(32, WORLD_WIDTH - 32);
                 enemy_spawn(&field->enemies[write_index], 1, x);
             }
         }

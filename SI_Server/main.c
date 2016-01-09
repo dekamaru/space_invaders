@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "network/net.h"
+#include "util/time.h"
 
 void command_input_handler() {
     char command[1024];
@@ -21,6 +22,7 @@ int main(int *argc, char **argv)
 {
     pthread_t command_input;
     pthread_create(&command_input, NULL, command_input_handler, NULL);
+    srand((unsigned int) time(NULL));
     net_server_start(26001);
     return 0;
 }

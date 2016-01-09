@@ -24,6 +24,5 @@ int net_server_start(uint16_t port);
 void *net_server_receive(void *);
 void *net_server_send(void *);
 void *net_game_thread(net_client_descr_t *);
-void sigpipe_handler(int);
 
 #endif // NETWORK_NET_H

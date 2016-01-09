@@ -73,7 +73,7 @@ void *net_game_thread(net_client_descr_t *clients) {
     net_field = malloc(sizeof(Field));
     char* field_buffer = malloc(512);
     game_init(net_field);
-    signal(SIGPIPE, (__sighandler_t) sigpipe_handler); // enable catcher
+
     // Limit loop to 30 fps
     const int FRAMES_PER_SECOND = 30;
     const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
@@ -136,16 +136,4 @@ void *net_server_send(void* args) {
             }
         }
     }
-}
-
-/**
- * This handler needs to stabilize closing server
- */
-void sigpipe_handler(int signal) {
-    net_server_status = SHUTDOWN;
-    // Sigpipe catched
-    close(net_socket);
-    printf("[Server] Client disconnected from server, shutting down.\n");
-    fflush(stdout);
-    exit(0);
 }

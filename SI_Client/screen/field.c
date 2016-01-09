@@ -5,6 +5,15 @@
 #include "../engine/engine.h"
 #include "game.h"
 #include "../game/gameobject.h"
+#include "../engine/renderer.h"
+
+/**
+ * FPS variables
+ */
+#define FPS_INTERVAL 1.0
+Uint32 fps_lasttime;
+Uint32 fps_current;
+Uint32 fps_frames;
 
 Player *players[MAX_PLAYERS];
 int players_count, started, player_direction;
@@ -16,6 +25,9 @@ SDL_Rect* bounds;
 void field_init() {
     // Init global variables
     players_count = 0; started = 1; player_direction = -1;
+    fps_lasttime = SDL_GetTicks();
+    fps_frames = 0;
+
     bounds = malloc(sizeof(SDL_Rect));
 
     // Creating send packets queue
@@ -40,7 +52,7 @@ void field_draw(void *renderer) {
     font_render(info, 0, 20, 0, assets_bundle->fonts[2], w);
     sprintf(info, "Score: %i", players[client_id]->score);
     font_render(info, 0, 40, 0, assets_bundle->fonts[2], w);
-    free(info);
+
     // TODO: fix stun player if shooting & moving
     for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i]);
     while (!queue_empty(enemies)) {
@@ -53,6 +65,22 @@ void field_draw(void *renderer) {
         go_render(go, bounds);
         free(go);
     }
+
+    /**
+     * Calculating drawing fps
+     */
+    fps_frames++;
+    if (fps_lasttime < SDL_GetTicks() - FPS_INTERVAL * 1000)
+    {
+        fps_lasttime = SDL_GetTicks();
+        fps_current = fps_frames;
+        fps_frames = 0;
+
+    }
+    sprintf(info, "FPS: %i", fps_current);
+    font_render(info, 0, 60, 0, assets_bundle->fonts[2], w);
+
+    free(info);
 }
 
 void field_event(void *event) {
@@ -63,10 +91,14 @@ void field_event(void *event) {
         case SDL_KEYDOWN:
             switch(e->key.keysym.sym) {
                 case SDLK_LEFT:
-                    player_direction = 0;
+                    sprintf(buffer, "%i:%i", client_id, 0);
+                    p = (Packet*) net_create_packet(4, 3, buffer);
+                    queue_push(packets_send, p);
                     break;
                 case SDLK_RIGHT:
-                    player_direction = 1;
+                    sprintf(buffer, "%i:%i", client_id, 1);
+                    p = (Packet*) net_create_packet(4, 3, buffer);
+                    queue_push(packets_send, p);
                     break;
                 default:
                     break;
@@ -74,12 +106,6 @@ void field_event(void *event) {
             break;
         case SDL_KEYUP:
             switch(e->key.keysym.sym) {
-                case SDLK_LEFT:
-                    if (player_direction == 0) player_direction = -1;
-                    break;
-                case SDLK_RIGHT:
-                    if (player_direction == 1) player_direction = -1;
-                    break;
                 case SDLK_SPACE:
                     sprintf(buffer, "%i", client_id);
                     Packet *s = (Packet*) net_create_packet(5, 1, buffer);
@@ -89,11 +115,6 @@ void field_event(void *event) {
                     break;
             }
             break;
-    }
-    if (player_direction != -1) {
-        sprintf(buffer, "%i:%i", client_id, player_direction);
-        p = (Packet*) net_create_packet(4, 3, buffer);
-        queue_push(packets_send, p);
     }
 }
 
