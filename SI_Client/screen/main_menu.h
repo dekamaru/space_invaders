@@ -18,7 +18,6 @@ void main_menu_event(void* event);
 void main_menu_update();
 void main_menu_select();
 void main_render_menu(int menu_part);
-void main_menu_connect();
 
 int menu_pointer;
 int menu_part;

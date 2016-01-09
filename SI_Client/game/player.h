@@ -17,6 +17,6 @@ typedef struct Player {
 
 Player* player_create();
 void player_update(Player *p, int x, int y, int health, int score);
-void player_render(Player *p);
+void player_render(Player *p, int c_id);
 
 #endif //SI_CLIENT_PLAYER_H

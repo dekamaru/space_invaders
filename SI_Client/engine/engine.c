@@ -37,13 +37,13 @@ int E_Init() {
     /*
      * Images
      */
-    assets_load_image(assets_bundle, "assets/player.png");
+    assets_load_image(assets_bundle, "assets/player1.png");
     assets_load_image(assets_bundle, "assets/bullet-player.png");
     assets_load_image(assets_bundle, "assets/bullet-enemy.png");
     assets_load_image(assets_bundle, "assets/enemy.png");
     assets_load_image(assets_bundle, "assets/bg.png");
     assets_load_image(assets_bundle, "assets/blood-screen.png");
-
+    assets_load_image(assets_bundle, "assets/player2.png");
     stars_counter = 0;
     // ALL THINGS DONE, GO TO MAIN MENU
     switch_screen(1);

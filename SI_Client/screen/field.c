@@ -49,7 +49,7 @@ void field_draw(void *renderer) {
     sprintf(info, "Score: %i", players[client_id]->score);
     font_render(info, 0, 40, 0, assets_bundle->fonts[2], w);
 
-    for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i]);
+    for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i], i);
     while (!queue_empty(enemies)) {
         Enemy *e = queue_pop(enemies);
         enemy_render(e, bounds);

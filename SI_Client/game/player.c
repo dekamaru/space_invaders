@@ -14,13 +14,14 @@ void player_update(Player *p, int x, int y, int health, int score) {
     p->score = score;
 }
 
-void player_render(Player *p) {
+void player_render(Player *p, int c_id) {
     SDL_Rect player;
     player.x = p->x;
     player.y = p->y;
     player.w = p->width;
     player.h = p->height;
-    SDL_RenderCopy(renderer, assets_bundle->images[0], NULL, &player);
+    int index = (c_id == 0) ? 0 : 6;
+    SDL_RenderCopy(renderer, assets_bundle->images[index], NULL, &player);
 }
 
 Player* player_create() {

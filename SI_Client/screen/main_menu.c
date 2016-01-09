@@ -50,12 +50,7 @@ void main_menu_event(void* event) {
         case SDL_MOUSEMOTION:
             menu_pointer = -1;
             for(int i = 0; i < menus[menu_part].items_count; i++) {
-                if (
-                    e->motion.x >= menus[menu_part].borders[i].x &&
-                    e->motion.x <= menus[menu_part].borders[i].x + menus[menu_part].borders[i].w &&
-                    e->motion.y >= menus[menu_part].borders[i].y &&
-                    e->motion.y <= menus[menu_part].borders[i].y + menus[menu_part].borders[i].h
-                ) {
+                if (renderer_mouse_in_rect(&menus[menu_part].borders[i], e->motion.x, e->motion.y)) {
                     menu_pointer = i;
                 }
             }
@@ -71,27 +66,18 @@ void main_menu_event(void* event) {
 
 }
 
-void main_menu_connect() {
-    // TODO: create connect gui
-    if (net_client_connect("127.0.0.1", 26001) == 0) {
-        menu_part = 1;
-    } else {
-        switch_screen(2);
-    }
-}
-
 void main_menu_select() {
     switch(menu_part) {
         case 0:
             if (menu_pointer == 0) {
-                main_menu_connect();
+                switch_screen(4);
             } else {
                 E_Shutdown();
             }
             break;
         case 1:
             if (menu_pointer == 0) {
-                main_menu_connect();
+                switch_screen(4);
             } else {
                 menu_part = 0;
             }

@@ -3,6 +3,7 @@
 #include "../screen/game.h"
 #include "engine.h"
 #include "../screen/field.h"
+#include "../screen/connect.h"
 
 void switch_screen(int screen_id) {
     switch(screen_id) {
@@ -23,6 +24,12 @@ void switch_screen(int screen_id) {
             current_screen.update = &field_update;
             current_screen.event = &field_event;
             field_init();
+            break;
+        case 4:
+            current_screen.draw = &connect_draw;
+            current_screen.update = &connect_update;
+            current_screen.event = &connect_event;
+            connect_init();
             break;
         default:
             break;
