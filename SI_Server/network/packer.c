@@ -4,7 +4,7 @@
 
 
 int packer_pack_player(char* buffer, Player* p) {
-    return sprintf(buffer, "%i:%i:%i:%i:%i:", 1, p->x, p->y, p->lives, p->score);
+    return sprintf(buffer, "%i:%i:%i:%i:%i:", 1, p->x, p->y, p->health, p->score);
 }
 
 int packer_pack_enemy(char* buffer, Enemy* e) {

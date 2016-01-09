@@ -7,10 +7,10 @@
 #include "player.h"
 #include "../engine/engine.h"
 
-void player_update(Player *p, int x, int y, int lives, int score) {
+void player_update(Player *p, int x, int y, int health, int score) {
     p->x = x;
     p->y = y;
-    p->lives = lives;
+    p->health = health;
     p->score = score;
 }
 

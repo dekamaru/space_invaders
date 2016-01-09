@@ -10,13 +10,13 @@ uint32_t player_last_shoot;
 
 typedef struct Player {
     int x, y;
-    int lives;
+    int health;
     int score;
     int width, height;
 } Player;
 
 Player* player_create();
-void player_update(Player *p, int x, int y, int lives, int score);
+void player_update(Player *p, int x, int y, int health, int score);
 void player_render(Player *p);
 
 #endif //SI_CLIENT_PLAYER_H

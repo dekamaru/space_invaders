@@ -42,6 +42,7 @@ int E_Init() {
     assets_load_image(assets_bundle, "assets/bullet-enemy.png");
     assets_load_image(assets_bundle, "assets/enemy.png");
     assets_load_image(assets_bundle, "assets/bg.png");
+    assets_load_image(assets_bundle, "assets/blood-screen.png");
 
     stars_counter = 0;
     // ALL THINGS DONE, GO TO MAIN MENU

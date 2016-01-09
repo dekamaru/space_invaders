@@ -5,13 +5,12 @@
 
 typedef struct Player {
     int x, y;
-    int lives;
+    int health;
     int width, height; // for collision box
     int score;
 } Player;
 
 Player player_create(int x, int y);
 void player_move(Player *p, int direction);
-void player_shoot();
 
 #endif // GAME_PLAYER_H

@@ -69,7 +69,7 @@ void game_update_gameobjects(Field* field) {
                 if (rectangle_collide(&go, &player)) {
                     if (field->objects[i].owner == 2) {
                         field->objects[i].alive = 0;
-                        field->players[j].lives--;
+                        field->players[j].health -= 10;
                     }
                 }
             }
@@ -98,7 +98,7 @@ void game_update_enemies(Field* field) {
                 Rectangle player = player_rectangle(&field->players[j]);
                 if (rectangle_collide(&enemy, &player)) {
                     field->enemies[i].alive = 0;
-                    field->players[j].lives--;
+                    field->players[j].health -= 10;
                 }
             }
 

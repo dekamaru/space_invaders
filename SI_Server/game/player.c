@@ -5,7 +5,7 @@ Player player_create(int x, int y) {
     p.x = x;
     p.y = y;
     p.width = p.height = 32;
-    p.lives = 3;
+    p.health = 100;
     p.score = 0;
     return p;
 }

@@ -11,7 +11,7 @@
  */
 #define FPS_INTERVAL 1.0
 Uint32 fps_lasttime, fps_current, fps_frames;
-int players_count, started, player_direction;
+int players_count, started, player_direction, last_health, blood_screen;
 int keyboard[3];
 Queue *packets_send, *enemies, *gameobjects;
 SDL_Rect* bounds;
@@ -19,9 +19,9 @@ Player *players[MAX_PLAYERS];
 
 void field_init() {
     // Init global variables
-    players_count = 0; started = 1; player_direction = -1;
+    players_count = 0; started = 1; player_direction = -1; last_health = 100; fps_frames = 0;
+    blood_screen = 0;
     fps_lasttime = SDL_GetTicks();
-    fps_frames = 0;
     player_last_shoot = SDL_GetTicks();
 
     bounds = malloc(sizeof(SDL_Rect));
@@ -44,12 +44,11 @@ void field_draw(void *renderer) {
     SDL_Color w = {255, 255, 255, 255};
     font_render("SI alpha v 0.3 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
     char* info = malloc(20);
-    sprintf(info, "Lives: %i", players[client_id]->lives);
+    sprintf(info, "Health: %i", players[client_id]->health);
     font_render(info, 0, 20, 0, assets_bundle->fonts[2], w);
     sprintf(info, "Score: %i", players[client_id]->score);
     font_render(info, 0, 40, 0, assets_bundle->fonts[2], w);
 
-    // TODO: fix stun player if shooting & moving
     for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i]);
     while (!queue_empty(enemies)) {
         Enemy *e = queue_pop(enemies);
@@ -60,6 +59,13 @@ void field_draw(void *renderer) {
         GameObject *go = queue_pop(gameobjects);
         go_render(go, bounds);
         free(go);
+    }
+
+    if (blood_screen) {
+        bounds->x = bounds->y = 0;
+        bounds->w = 640; bounds->h = 480;
+        SDL_RenderCopy(renderer, assets_bundle->images[5], NULL, bounds);
+        blood_screen = 0;
     }
 
     /**
@@ -116,6 +122,10 @@ void field_event(void *event) {
 }
 
 void field_update() {
+    if (last_health > players[client_id]->health) {
+        last_health = players[client_id]->health;
+        blood_screen = 1;
+    }
     char* buffer = malloc(3);
     Packet *p;
     if (keyboard[0]) {
