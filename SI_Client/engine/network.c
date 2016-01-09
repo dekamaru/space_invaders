@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "network.h"
 
 int net_client_connect(char* addr, uint16_t port) {
@@ -28,8 +29,9 @@ Packet *net_receive_packet() {
         memcpy(buffer, server_reply, sizeof(Packet));
         Packet *p = (Packet *) buffer;
         if (p->data_length != 0) {
-            char *received_data = malloc(p->data_length);
+            char *received_data = malloc(p->data_length + 1);
             recv(net_socket, received_data, p->data_length, 0);
+            received_data[p->data_length] = 0;
             strcpy(p->data, received_data);
             free(received_data);
             return p;
@@ -46,6 +48,6 @@ char* net_create_packet(uint32_t packet_id, uint32_t data_length, char* data) {
     return buffer;
 }
 
-void net_send_packet(char *packet, int length) {
+void net_send_packet(char *packet, uint32_t length) {
     send(net_socket, packet, length, 0);
 }

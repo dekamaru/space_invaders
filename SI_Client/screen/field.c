@@ -1,33 +1,28 @@
 #include <pthread.h>
 #include <stdio.h>
-#include <unistd.h>
 #include "field.h"
 #include "../util/font.h"
 #include "../engine/engine.h"
 #include "game.h"
 #include "../game/gameobject.h"
-#include "../engine/renderer.h"
 
 /**
  * FPS variables
  */
 #define FPS_INTERVAL 1.0
-Uint32 fps_lasttime;
-Uint32 fps_current;
-Uint32 fps_frames;
-
-Player *players[MAX_PLAYERS];
+Uint32 fps_lasttime, fps_current, fps_frames;
 int players_count, started, player_direction;
-Queue* packets_send;
-Queue* enemies;
-Queue* gameobjects;
+int keyboard[3];
+Queue *packets_send, *enemies, *gameobjects;
 SDL_Rect* bounds;
+Player *players[MAX_PLAYERS];
 
 void field_init() {
     // Init global variables
     players_count = 0; started = 1; player_direction = -1;
     fps_lasttime = SDL_GetTicks();
     fps_frames = 0;
+    player_last_shoot = SDL_GetTicks();
 
     bounds = malloc(sizeof(SDL_Rect));
 
@@ -46,7 +41,6 @@ void field_init() {
 }
 
 void field_draw(void *renderer) {
-
     SDL_Color w = {255, 255, 255, 255};
     font_render("SI alpha v 0.3 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
     char* info = malloc(20);
@@ -87,20 +81,17 @@ void field_draw(void *renderer) {
 
 void field_event(void *event) {
     SDL_Event* e = (SDL_Event*) event;
-    char* buffer = malloc(3);
-    Packet *p;
     switch(e->type) {
         case SDL_KEYDOWN:
             switch(e->key.keysym.sym) {
                 case SDLK_LEFT:
-                    sprintf(buffer, "%i:%i", client_id, 0);
-                    p = (Packet*) net_create_packet(4, 3, buffer);
-                    queue_push(packets_send, p);
+                    keyboard[0] = 1;
                     break;
                 case SDLK_RIGHT:
-                    sprintf(buffer, "%i:%i", client_id, 1);
-                    p = (Packet*) net_create_packet(4, 3, buffer);
-                    queue_push(packets_send, p);
+                    keyboard[1] = 1;
+                    break;
+                case SDLK_SPACE:
+                    keyboard[2] = 1;
                     break;
                 default:
                     break;
@@ -108,10 +99,14 @@ void field_event(void *event) {
             break;
         case SDL_KEYUP:
             switch(e->key.keysym.sym) {
+                case SDLK_LEFT:
+                    keyboard[0] = 0;
+                    break;
+                case SDLK_RIGHT:
+                    keyboard[1] = 0;
+                    break;
                 case SDLK_SPACE:
-                    sprintf(buffer, "%i", client_id);
-                    Packet *s = (Packet*) net_create_packet(5, 1, buffer);
-                    queue_push(packets_send, s);
+                    keyboard[2] = 0;
                     break;
                 default:
                     break;
@@ -121,6 +116,27 @@ void field_event(void *event) {
 }
 
 void field_update() {
+    char* buffer = malloc(3);
+    Packet *p;
+    if (keyboard[0]) {
+        sprintf(buffer, "%i:%i", client_id, 0);
+        p = (Packet*) net_create_packet(4, 3, buffer);
+        queue_push(packets_send, p);
+    }
+    if (keyboard[1]) {
+        sprintf(buffer, "%i:%i", client_id, 1);
+        p = (Packet*) net_create_packet(4, 3, buffer);
+        queue_push(packets_send, p);
+    }
+    if (keyboard[2]) {
+        uint32_t current_tick = SDL_GetTicks();
+        if (current_tick - player_last_shoot >= SHOOT_COOLDOWN) {
+            sprintf(buffer, "%i", client_id);
+            Packet *s = (Packet*) net_create_packet(5, 1, buffer);
+            queue_push(packets_send, s);
+            player_last_shoot = current_tick;
+        }
+    }
 }
 
 void receiver_thread() {

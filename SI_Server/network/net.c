@@ -98,8 +98,9 @@ void *net_server_receive(void* args) {
         memcpy(buffer, client_reply, sizeof(Packet));
         Packet* p = (Packet*) buffer;
         if (p->data_length != 0) {
-            char* received_data = malloc(p->data_length);
+            char* received_data = malloc(p->data_length + 1);
             recv(sock, received_data, p->data_length, 0);
+            received_data[p->data_length] = 0;
             strcpy(p->data, received_data);
             free(received_data);
             if (net_field != NULL) game_packet_handle(p->packet_id, p->data, net_field);

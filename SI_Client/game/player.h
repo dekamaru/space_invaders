@@ -5,6 +5,9 @@
 #ifndef SI_CLIENT_PLAYER_H
 #define SI_CLIENT_PLAYER_H
 
+#define SHOOT_COOLDOWN 400 // in ms
+uint32_t player_last_shoot;
+
 typedef struct Player {
     int x, y;
     int lives;

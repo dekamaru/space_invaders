@@ -12,7 +12,7 @@ int packer_pack_enemy(char* buffer, Enemy* e) {
 }
 
 int packer_pack_gameobject(char* buffer, GameObject* go) {
-    return sprintf(buffer, "%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, 0); // last argument - padding for other packs;
+    return sprintf(buffer, "%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, go->owner);
 }
 
 void packer_pack_field(char* buffer, Field *f) {
