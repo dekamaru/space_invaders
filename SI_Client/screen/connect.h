@@ -6,7 +6,7 @@
 #define SI_CLIENT_CONNECT_H
 
 #define DEFAULT_IP "127.0.0.1"
-#define DEFAULT_PORT "26000"
+#define DEFAULT_PORT "26001"
 
 void connect_init();
 void connect_draw(void* renderer);

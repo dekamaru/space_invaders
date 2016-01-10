@@ -7,6 +7,7 @@
 #include "../engine/engine.h"
 #include "../engine/renderer.h"
 #include "../engine/network.h"
+#include "main_menu.h"
 
 SDL_Rect connect_bounds[4];
 char *inputs[2];
@@ -28,7 +29,6 @@ void connect_init() {
 
 void connect_draw(void *renderer) {
     SDL_Color white = {255, 255, 255, 255};
-    SDL_Color black = {0, 0, 0, 255};
     SDL_Color red = {255, 0, 0, 255};
     font_render("Connect to server:", 0, 20, 1, assets_bundle->fonts[0], white);
     font_render("Server IP:", 0, 90, 1, assets_bundle->fonts[2], white);
@@ -72,8 +72,8 @@ void connect_event(void *event) {
                         if (net_client_connect(inputs[0], atoi(inputs[1])) == 1) {
                             switch_screen(2);
                         } else {
-                            // TODO: connection failed in other screen!
                             switch_screen(1);
+                            menu_part = 1; // Retry menu
                         }
                         break;
                     case 3:
