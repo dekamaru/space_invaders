@@ -6,12 +6,9 @@
 #include "game.h"
 #include "../game/gameobject.h"
 
-/**
- * FPS variables
- */
 #define FPS_INTERVAL 1.0
 Uint32 fps_lasttime, fps_current, fps_frames;
-int players_count, started, player_direction, last_health, blood_screen;
+int players_count, started, last_health, blood_screen;
 int keyboard[3];
 Queue *packets_send, *enemies, *gameobjects;
 SDL_Rect* bounds;
@@ -19,7 +16,7 @@ Player *players[MAX_PLAYERS];
 
 void field_init() {
     // Init global variables
-    players_count = 0; started = 1; player_direction = -1; last_health = 100; fps_frames = 0;
+    players_count = 0; started = 1; last_health = 100; fps_frames = 0;
     blood_screen = 0;
     fps_lasttime = SDL_GetTicks();
     player_last_shoot = SDL_GetTicks();
@@ -42,14 +39,22 @@ void field_init() {
 
 void field_draw(void *renderer) {
     SDL_Color w = {255, 255, 255, 255};
-    font_render("SI alpha v 0.3 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
+    font_render("SI alpha v 0.4 - Work in progress", 0, 0, 0, assets_bundle->fonts[2], w);
     char* info = malloc(20);
-    sprintf(info, "Health: %i", players[client_id]->health);
+    if (!players[client_id]->is_dead) {
+        sprintf(info, "Health: %i", players[client_id]->health);
+    } else {
+        sprintf(info, "You are dead!");
+    }
     font_render(info, 0, 20, 0, assets_bundle->fonts[2], w);
     sprintf(info, "Score: %i", players[client_id]->score);
     font_render(info, 0, 40, 0, assets_bundle->fonts[2], w);
 
-    for(int i = 0; i < MAX_PLAYERS; i++) player_render(players[i], i);
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if (!players[i]->is_dead) {
+            player_render(players[i], i);
+        }
+    }
     while (!queue_empty(enemies)) {
         Enemy *e = queue_pop(enemies);
         enemy_render(e, bounds);
@@ -122,29 +127,37 @@ void field_event(void *event) {
 }
 
 void field_update() {
-    if (last_health > players[client_id]->health) {
+    score = players[client_id]->score;
+    for(int i = 0; i < MAX_PLAYERS; i++) {
+        if (players[i]->health == -1) {
+            players[i]->is_dead = 1;
+        }
+    }
+    if (last_health > players[client_id]->health && !players[client_id]->is_dead) {
         last_health = players[client_id]->health;
         blood_screen = 1;
     }
-    char* buffer = malloc(3);
-    Packet *p;
-    if (keyboard[0]) {
-        sprintf(buffer, "%i:%i", client_id, 0);
-        p = (Packet*) net_create_packet(4, 3, buffer);
-        queue_push(packets_send, p);
-    }
-    if (keyboard[1]) {
-        sprintf(buffer, "%i:%i", client_id, 1);
-        p = (Packet*) net_create_packet(4, 3, buffer);
-        queue_push(packets_send, p);
-    }
-    if (keyboard[2]) {
-        uint32_t current_tick = SDL_GetTicks();
-        if (current_tick - player_last_shoot >= SHOOT_COOLDOWN) {
-            sprintf(buffer, "%i", client_id);
-            Packet *s = (Packet*) net_create_packet(5, 1, buffer);
-            queue_push(packets_send, s);
-            player_last_shoot = current_tick;
+    if (!players[client_id]->is_dead) {
+        char* buffer = malloc(3);
+        Packet *p;
+        if (keyboard[0]) {
+            sprintf(buffer, "%i:%i", client_id, 0);
+            p = (Packet*) net_create_packet(4, 3, buffer);
+            queue_push(packets_send, p);
+        }
+        if (keyboard[1]) {
+            sprintf(buffer, "%i:%i", client_id, 1);
+            p = (Packet*) net_create_packet(4, 3, buffer);
+            queue_push(packets_send, p);
+        }
+        if (keyboard[2]) {
+            uint32_t current_tick = SDL_GetTicks();
+            if (current_tick - player_last_shoot >= SHOOT_COOLDOWN) {
+                sprintf(buffer, "%i", client_id);
+                Packet *s = (Packet*) net_create_packet(5, 1, buffer);
+                queue_push(packets_send, s);
+                player_last_shoot = current_tick;
+            }
         }
     }
 }
@@ -153,8 +166,22 @@ void receiver_thread() {
 
     while(started) {
         Packet *p = net_receive_packet();
-        if (p->packet_id == 3) {
-            field_parse_packet(p->data);
+        if (p == NULL) {
+            // server closed
+            started = 0;
+            switch_screen(5);
+            return;
+        }
+        switch(p->packet_id) {
+            case 3:
+                field_parse_packet(p->data);
+                break;
+            case 8:
+                started = 0;
+                switch_screen(5); // game over screen
+                break;
+            default:
+                break;
         }
         free(p);
     }

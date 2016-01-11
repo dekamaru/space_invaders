@@ -67,9 +67,12 @@ void game_update_gameobjects(Field* field) {
             for(int j = 0; j < MAX_PLAYERS; j++) {
                 Rectangle player = player_rectangle(&field->players[j]);
                 if (rectangle_collide(&go, &player)) {
-                    if (field->objects[i].owner == 2) {
+                    if (field->objects[i].type == 1 && field->objects[i].owner == 2) {
                         field->objects[i].alive = 0;
                         field->players[j].health -= 10;
+                        if (field->players[j].health == 0) {
+                            player_dead(&field->players[j]);
+                        }
                     }
                 }
             }
@@ -95,10 +98,15 @@ void game_update_enemies(Field* field) {
 
             // COLLISION WITH PLAYERS
             for(int j = 0; j < MAX_PLAYERS; j++) {
-                Rectangle player = player_rectangle(&field->players[j]);
-                if (rectangle_collide(&enemy, &player)) {
-                    field->enemies[i].alive = 0;
-                    field->players[j].health -= 10;
+                if (!field->players[j].is_dead) {
+                    Rectangle player = player_rectangle(&field->players[j]);
+                    if (rectangle_collide(&enemy, &player)) {
+                        field->enemies[i].alive = 0;
+                        field->players[j].health -= 10;
+                        if (field->players[j].health == 0) {
+                            player_dead(&field->players[j]);
+                        }
+                    }
                 }
             }
 

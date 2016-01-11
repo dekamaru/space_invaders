@@ -17,4 +17,6 @@ void sender_thread();
 void field_resolve_data(int id, int a1, int a2, int a3, int a4);
 void field_parse_packet(char* data);
 
+int score;
+
 #endif //SI_CLIENT_FIELD_H

@@ -82,6 +82,18 @@ void *net_game_thread(net_client_descr_t *clients) {
     
     while(net_server_status != SHUTDOWN) {
         game_update(net_field);
+
+        int game_over = 1;
+        for(int i = 0; i < MAX_CONNECTIONS; i++) {
+            if (!net_field->players[i].is_dead) game_over = 0;
+        }
+        if (game_over) {
+            Packet* p = (Packet *) packet_create(8, 1, "1");
+            for(int i = 0; i < MAX_CONNECTIONS; i++) queue_push(clients[i].send, p);
+            net_server_status = SHUTDOWN;
+            return 0;
+        }
+
         packer_pack_field(field_buffer, net_field);
         Packet* p = (Packet*) packet_create(3, strlen(field_buffer), field_buffer);
         for(int i = 0; i < MAX_CONNECTIONS; i++) queue_push(clients[i].send, p);

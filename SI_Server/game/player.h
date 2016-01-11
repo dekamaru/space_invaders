@@ -8,9 +8,11 @@ typedef struct Player {
     int health;
     int width, height; // for collision box
     int score;
+    int is_dead;
 } Player;
 
 Player player_create(int x, int y);
 void player_move(Player *p, int direction);
+void player_dead(Player *p);
 
 #endif // GAME_PLAYER_H

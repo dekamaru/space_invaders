@@ -7,6 +7,7 @@ Player player_create(int x, int y) {
     p.width = p.height = 32;
     p.health = 100;
     p.score = 0;
+    p.is_dead = 0;
     return p;
 }
 
@@ -16,4 +17,9 @@ void player_move(Player *p, int direction) {
     } else {
         p->x += PLAYER_SPEED; // right
     }
+}
+
+void player_dead(Player *p) {
+    p->is_dead = 1;
+    p->health = -1;
 }

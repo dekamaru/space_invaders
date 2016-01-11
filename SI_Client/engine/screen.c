@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "../screen/field.h"
 #include "../screen/connect.h"
+#include "../screen/gameover.h"
 
 void switch_screen(int screen_id) {
     switch(screen_id) {
@@ -30,6 +31,12 @@ void switch_screen(int screen_id) {
             current_screen.update = &connect_update;
             current_screen.event = &connect_event;
             connect_init();
+            break;
+        case 5:
+            current_screen.draw = &gameover_draw;
+            current_screen.update = &gameover_update;
+            current_screen.event = &gameover_event;
+            gameover_init();
             break;
         default:
             break;

@@ -28,5 +28,6 @@ Player* player_create() {
     Player* p = malloc(sizeof(Player));
     p->width = 32;
     p->height = 32;
+    p->is_dead = 0;
     return p;
 }

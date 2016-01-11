@@ -37,6 +37,7 @@ Packet *net_receive_packet() {
             return p;
         }
     }
+    return NULL;
 }
 
 char* net_create_packet(uint32_t packet_id, uint32_t data_length, char* data) {

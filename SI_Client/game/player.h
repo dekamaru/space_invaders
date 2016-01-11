@@ -13,6 +13,7 @@ typedef struct Player {
     int health;
     int score;
     int width, height;
+    int is_dead;
 } Player;
 
 Player* player_create();
