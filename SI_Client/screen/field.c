@@ -133,6 +133,7 @@ void field_update() {
             players[i]->is_dead = 1;
         }
     }
+    if (players[client_id]->health > last_health) last_health = players[client_id]->health; // restore, if pickup'd healthpack
     if (last_health > players[client_id]->health && !players[client_id]->is_dead) {
         last_health = players[client_id]->health;
         blood_screen = 1;

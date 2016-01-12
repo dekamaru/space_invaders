@@ -30,5 +30,6 @@ void go_render(GameObject *go, SDL_Rect *bounds) {
     bounds->y = go->y;
     bounds->w = go->width;
     bounds->h = go->height;
-    SDL_RenderCopy(renderer, assets_bundle->images[go->owner], NULL, bounds);
+    int sprite_index = (go->type == 1) ? go->owner : 7; // 7 - index of hp sprite
+    SDL_RenderCopy(renderer, assets_bundle->images[sprite_index], NULL, bounds);
 }

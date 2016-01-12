@@ -44,6 +44,8 @@ int E_Init() {
     assets_load_image(assets_bundle, "assets/bg.png");
     assets_load_image(assets_bundle, "assets/blood-screen.png");
     assets_load_image(assets_bundle, "assets/player2.png");
+    assets_load_image(assets_bundle, "assets/healthpack.png");
+
     stars_counter = 0;
     // ALL THINGS DONE, GO TO MAIN MENU
     switch_screen(1);

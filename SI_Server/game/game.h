@@ -9,8 +9,12 @@
 #define WORLD_WIDTH 640
 #define WORLD_HEIGHT 480
 #define MAX_SPAWNED_ENEMIES 10
-#define ENEMY_SPAWN_CHANCE 1 // (50)
-#define ENEMY_SHOOT_CHANCE 1 // (100)
+#define ENEMY_SPAWN_CHANCE 50
+#define ENEMY_SHOOT_CHANCE 100
+
+
+#define HEALTH_PACK_CHANCE 10
+#define HEALTH_PACK_GAIN 50
 
 void game_init(Field* field); // field
 void game_packet_handle(int packet_id, char* packet_data, Field *f);

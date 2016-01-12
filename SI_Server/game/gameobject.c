@@ -37,5 +37,5 @@ void gameobject_spawn(GameObject *go, void* p, int owner, int type) {
     go->type = type;
     go->owner = owner;
     go->alive = 1;
-    go->speed = 6;
+    go->speed = (go->type == 1) ? 6 : 3;
 }

@@ -58,6 +58,11 @@ void game_update_gameobjects(Field* field) {
                             field->enemies[j].alive = 0; // destroy enemy
                             Player *a = field->objects[i].author;
                             a->score += 100;
+
+                            if (rand() % HEALTH_PACK_CHANCE == 1) {
+                                int index = field_gameobjects_find_space(field);
+                                gameobject_spawn(&field->objects[index], &field->enemies[j], 2, 2); // spawn healthpack
+                            }
                         }
                     }
                 }
@@ -67,12 +72,24 @@ void game_update_gameobjects(Field* field) {
             for(int j = 0; j < MAX_PLAYERS; j++) {
                 Rectangle player = player_rectangle(&field->players[j]);
                 if (rectangle_collide(&go, &player)) {
-                    if (field->objects[i].type == 1 && field->objects[i].owner == 2) {
-                        field->objects[i].alive = 0;
-                        field->players[j].health -= 10;
-                        if (field->players[j].health == 0) {
-                            player_dead(&field->players[j]);
-                        }
+                    switch(field->objects[i].type) {
+                        case 1:
+                            // Situation: bullet arrived at player
+                            if (field->objects[i].owner == 2) {
+                                field->objects[i].alive = 0;
+                                field->players[j].health -= 10;
+                                if (field->players[j].health == 0) {
+                                    player_dead(&field->players[j]);
+                                }
+                            }
+                            break;
+                        case 2:
+                            field->objects[i].alive = 0;
+                            field->players[j].health += HEALTH_PACK_GAIN;
+                            // Situation: health arrived at player
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -85,7 +102,7 @@ void game_update_enemies(Field* field) {
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if (field->enemies[i].alive == 1) {
             enemy_move(&field->enemies[i]);
-            if (rand() % 100 == ENEMY_SHOOT_CHANCE) {
+            if (rand() % ENEMY_SHOOT_CHANCE == 1) {
                 int index = field_gameobjects_find_space(field);
                 if (index != -1) {
                     gameobject_spawn(&field->objects[index], &field->enemies[i], 2, 1); // spawn bullet
@@ -114,7 +131,7 @@ void game_update_enemies(Field* field) {
     }
 
     if (field_enemies_count(field) < MAX_SPAWNED_ENEMIES) {
-        if (rand() % 50 == ENEMY_SPAWN_CHANCE) {
+        if (rand() % ENEMY_SPAWN_CHANCE == 1) {
             int write_index = field_enemies_find_space(field);
             if (write_index != -1) {
                 int x = rand_between(32, WORLD_WIDTH - 32);
