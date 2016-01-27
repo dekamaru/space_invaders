@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 09.01.16.
-//
-
 #include "rectangle.h"
 
 Rectangle enemy_rectangle(Enemy *e) {

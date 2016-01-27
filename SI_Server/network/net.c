@@ -14,13 +14,16 @@
 #include "packer.h"
 #include "../util/time.h"
 
-struct sockaddr_in net_server, net_client;
-int yes = 1;
+net_server_state net_server_status; // needed global var!
 
 int net_port_bind(uint16_t port) {
+    struct sockaddr_in net_server;
+    int net_socket;
+    const int yes = 1;
+
     net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (net_socket == -1) {
-        puts("net_port_bind(): socket creating fail!");
+        fprintf(stderr, "net_port_bind(): socket creating fail!\n");
         return 0;
     }
     net_server.sin_family = AF_INET;
@@ -30,17 +33,21 @@ int net_port_bind(uint16_t port) {
     if (bind(net_socket, (struct sockaddr*)&net_server, sizeof(net_server)) < 0) {
         return 0;
     }
-    return 1;
+    return net_socket;
 }
+
 int net_server_start(uint16_t port) {
-    if (net_port_bind(port) == 0) {
-        puts("net_server_start(): bind fail!");
+    int net_socket = net_port_bind(port);
+    net_client_descr_t clients[MAX_CONNECTIONS];
+    struct sockaddr_in net_client;
+    int clients_count = 0;
+    int net_new_socket = 0, net_c = 0;
+
+    if (net_socket == 0) {
+        fprintf(stderr, "[Server] Bind failed on port %i\n", port);
         return 0;
     }
-    puts("net_server_start(): binding success");
-
-    net_client_descr_t clients[MAX_CONNECTIONS];
-    clients_count = 0;
+    fprintf(stdout, "[Server] Binding success on port %i\n", port);
 
     listen(net_socket, MAX_CONNECTIONS);
     while((net_new_socket = accept(net_socket, (struct sockaddr*)&net_client, (socklen_t*)&net_c)) && clients_count < MAX_CONNECTIONS) {
@@ -50,14 +57,13 @@ int net_server_start(uint16_t port) {
         clients[clients_count].send = queue_create();
 
         // sending client his id
-        char* handshake = packet_create_handshake(clients_count);
+        const char* handshake = packet_create_handshake(clients_count);
         send(net_new_socket, handshake, sizeof(Packet) + 1, 0);
 
-        printf("[Server] Client connected.\n");
-        fflush(stdout);
+        fprintf(stdout, "[Server] Client connected.\n");
 
-        pthread_create(&net_receive_thread, NULL, net_server_receive, (void*) &clients[clients_count]);
-        pthread_create(&net_send_thread, NULL, net_server_send, (void*) &clients[clients_count]);
+        pthread_create(&net_receive_thread, NULL, (void *(*)(void *)) net_server_receive, (void*) &clients[clients_count]);
+        pthread_create(&net_send_thread, NULL, (void *(*)(void *)) net_server_send, (void*) &clients[clients_count]);
         if (clients_count == MAX_CONNECTIONS - 1) break;
         clients_count++;
     }
@@ -66,18 +72,20 @@ int net_server_start(uint16_t port) {
     net_server_status = RUNNING;
 
     pthread_join(game_thread, NULL); //waiting the game shutdown
-    return 1;
+    return 0;
 }
 
-void *net_game_thread(net_client_descr_t *clients) {
-    net_field = malloc(sizeof(Field));
+void net_game_thread(net_client_descr_t *clients) {
+    Field *net_field = malloc(sizeof(Field));
     char* field_buffer = malloc(512);
+
     game_init(net_field);
 
     for(int i = 0; i < MAX_CONNECTIONS; i++) {
         // sending packet 2 (game start)
         Packet *p = (Packet*) packet_create(2, 1, "1");
         queue_push(clients[i].send, p);
+        clients[i].field = net_field;
     }
     
     while(net_server_status != SHUTDOWN) {
@@ -91,7 +99,7 @@ void *net_game_thread(net_client_descr_t *clients) {
             Packet* p = (Packet *) packet_create(8, 1, "1");
             for(int i = 0; i < MAX_CONNECTIONS; i++) queue_push(clients[i].send, p);
             net_server_status = SHUTDOWN;
-            return 0;
+            break;
         }
 
         packer_pack_field(field_buffer, net_field);
@@ -101,9 +109,9 @@ void *net_game_thread(net_client_descr_t *clients) {
     }
 }
 
-void *net_server_receive(void* args) {
+void net_server_receive(void* args) {
     net_client_descr_t *arguments = (net_client_descr_t*) args;
-    int sock = arguments->socket;
+    const int sock = arguments->socket;
     char* client_reply = malloc(512);
     while(recv(sock, client_reply, sizeof(Packet), 0) > 0) {
         char* buffer = malloc(512);
@@ -115,17 +123,13 @@ void *net_server_receive(void* args) {
             received_data[p->data_length] = 0;
             strcpy(p->data, received_data);
             free(received_data);
-            if (net_field != NULL) game_packet_handle(p->packet_id, p->data, net_field);
+            if (arguments->field != NULL) game_packet_handle(p->packet_id, p->data, arguments->field);
         }
     }
-    if (clients_count == 1) {
-        clients_count--;
-    }
     close(arguments->socket);
-    return 0;
 }
 
-void *net_server_send(void* args) {
+void net_server_send(void* args) {
     net_client_descr_t *arguments = (net_client_descr_t*) args;
     while(net_server_status != SHUTDOWN) {
         if (!queue_empty(arguments->send)) {

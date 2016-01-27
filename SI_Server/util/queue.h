@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 07.01.16.
-//
-
 #ifndef SI_SERVER_QUEUE_H
 #define SI_SERVER_QUEUE_H
 

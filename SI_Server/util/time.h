@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 05.01.16.
-//
-
 #include <stdint.h>
 
 #ifndef SI_SERVER_TIME_H

@@ -1,7 +1,3 @@
-//
-// Created by dekamaru on 07.01.16.
-//
-
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,7 +13,7 @@ Queue *queue_create() {
 void queue_push(Queue *q, Packet *value) {
     if (q->count >= MAX_QUEUE_SIZE) {
         fprintf(stderr, "Queue is full.\n");
-        exit(666);  /* Exit program, returning error code. */
+        exit(666);
     }
     int newElementIndex = (q->front + q->count) % MAX_QUEUE_SIZE;
     q->queue_array[newElementIndex] = value;

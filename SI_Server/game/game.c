@@ -1,8 +1,6 @@
 #include "game.h"
 #include "../util/time.h"
 #include "rectangle.h"
-
-#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -29,7 +27,7 @@ void game_packet_handle(int packet_id, char* packet_data, Field *f) {
         break;
         case 5: {
             sscanf(packet_data, "%i", &player_id);
-            int index = field_gameobjects_find_space(f);
+            const int index = field_gameobjects_find_space(f);
             if (index != -1) {
                 gameobject_spawn(&f->objects[index], &f->players[player_id], 1, 1); // spawn bullet
             }
@@ -57,7 +55,7 @@ void game_update_gameobjects(Field* field) {
                             field->objects[i].alive = 0; // destroy go
                             field->enemies[j].alive = 0; // destroy enemy
                             Player *a = field->objects[i].author;
-                            a->score += 100;
+                            a->score += ENEMY_DEFEAT_SCORE;
 
                             if (rand() % HEALTH_PACK_CHANCE == 1) {
                                 int index = field_gameobjects_find_space(field);
@@ -134,7 +132,7 @@ void game_update_enemies(Field* field) {
         if (rand() % ENEMY_SPAWN_CHANCE == 1) {
             int write_index = field_enemies_find_space(field);
             if (write_index != -1) {
-                int x = rand_between(32, WORLD_WIDTH - 32);
+                const int x = rand_between(32, WORLD_WIDTH - 32);
                 enemy_spawn(&field->enemies[write_index], 1, x);
             }
         }

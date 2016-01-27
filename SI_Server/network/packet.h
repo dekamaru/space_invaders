@@ -6,7 +6,7 @@
 typedef struct Packet {
     uint32_t packet_id;
     uint32_t data_length;
-    char data[0];
+    char data[];
 } Packet;
 
 char* packet_create(uint32_t packet_id, uint32_t data_length, char* data);
