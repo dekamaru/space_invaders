@@ -1,5 +1,5 @@
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_render.h>
+#include <SDL_rect.h>
+#include <SDL_render.h>
 
 #ifndef SI_CLIENT_RENDERER_H
 #define SI_CLIENT_RENDERER_H

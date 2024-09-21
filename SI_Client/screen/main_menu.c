@@ -1,4 +1,4 @@
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 
 #include "main_menu.h"
 #include "../util/font.h"

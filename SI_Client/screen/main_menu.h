@@ -1,7 +1,7 @@
 #ifndef SI_CLIENT_MAIN_MENU_H
 #define SI_CLIENT_MAIN_MENU_H
 
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include "../engine/screen.h"
 #include "../engine/assets.h"
 

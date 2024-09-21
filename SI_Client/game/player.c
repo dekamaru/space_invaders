@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include <SDL2/SDL_rect.h>
+#include <SDL_rect.h>
 #include "player.h"
 #include "../engine/engine.h"
 

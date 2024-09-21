@@ -5,7 +5,7 @@
 #ifndef SI_CLIENT_GAMEOBJECT_H
 #define SI_CLIENT_GAMEOBJECT_H
 
-#include <SDL2/SDL_rect.h>
+#include <SDL_rect.h>
 
 typedef struct GameObject {
     int x, y;

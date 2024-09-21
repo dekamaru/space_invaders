@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_render.h>
+#include <SDL_rect.h>
+#include <SDL_render.h>
 #include "enemy.h"
 #include "../engine/engine.h"
 

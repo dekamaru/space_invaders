@@ -1,8 +1,8 @@
 #ifndef SI_CLIENT_ASSETS_H
 #define SI_CLIENT_ASSETS_H
 
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
 
 typedef struct Assets {
     TTF_Font **fonts;

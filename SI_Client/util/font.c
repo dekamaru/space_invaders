@@ -1,4 +1,4 @@
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include "font.h"
 #include "../engine/engine.h"
 

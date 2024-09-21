@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include <SDL2/SDL_render.h>
+#include <SDL_render.h>
 #include "gameobject.h"
 #include "../engine/engine.h"
 

@@ -163,7 +163,7 @@ void field_update() {
     }
 }
 
-void receiver_thread() {
+void* receiver_thread() {
 
     while(started) {
         Packet *p = net_receive_packet();
@@ -171,7 +171,7 @@ void receiver_thread() {
             // server closed
             started = 0;
             switch_screen(5);
-            return;
+            return NULL;
         }
         switch(p->packet_id) {
             case 3:
@@ -186,9 +186,11 @@ void receiver_thread() {
         }
         free(p);
     }
+
+    return NULL;
 }
 
-void sender_thread() {
+void* sender_thread() {
     while(started) {
         if(!queue_empty(packets_send)) {
             Packet *p = queue_pop(packets_send);
@@ -197,6 +199,8 @@ void sender_thread() {
             free(buf);
         }
     }
+
+    return NULL;
 }
 
 void field_parse_packet(char* data) {

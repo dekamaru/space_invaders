@@ -1,8 +1,8 @@
 #ifndef SI_CLIENT_SCREEN_H
 #define SI_CLIENT_SCREEN_H
 
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_render.h>
+#include <SDL_events.h>
+#include <SDL_render.h>
 #include "assets.h"
 
 typedef struct E_Screen {
