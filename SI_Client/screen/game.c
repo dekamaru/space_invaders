@@ -22,11 +22,14 @@ void game_wait_start() {
     int started = 0;
     while(!started) {
         Packet *p = net_receive_packet();
-        if (p->packet_id == 2) {
-            free(p);
-            switch_screen(3);
-            started = 1;
+        if (p != NULL) {
+            if (p->packet_id == 2) {
+                free(p);
+                switch_screen(3);
+                started = 1;
+            }
         }
+
     }
 }
 

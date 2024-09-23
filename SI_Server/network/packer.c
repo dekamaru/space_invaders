@@ -4,15 +4,15 @@
 
 
 int packer_pack_player(char* buffer, Player* p) {
-    return sprintf(buffer, "%i:%i:%i:%i:%i:", 1, p->x, p->y, p->health, p->score);
+    return sprintf(buffer, "%i:%i:%i:%i:%i:%i:", 1, p->x, p->y, p->health, p->score, p->is_dead);
 }
 
 int packer_pack_enemy(char* buffer, Enemy* e) {
-    return sprintf(buffer, "%i:%i:%i:%i:%i:", 2, e->x, e->y, e->type, e->health);
+    return sprintf(buffer, "%i:%i:%i:%i:%i:%i:", 2, e->x, e->y, e->type, e->health, e->alive);
 }
 
 int packer_pack_gameobject(char* buffer, GameObject* go) {
-    return sprintf(buffer, "%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, go->owner);
+    return sprintf(buffer, "%i:%i:%i:%i:%i:%i:", 3, go->x, go->y, go->type, go->owner, go->alive);
 }
 
 void packer_pack_field(char* buffer, Field *f) {
@@ -23,18 +23,14 @@ void packer_pack_field(char* buffer, Field *f) {
         size += offset;
     }
     for(int i = 0; i < MAX_ENEMIES; i++) {
-        if (f->enemies[i].alive == 1) {
-            offset = packer_pack_enemy(buffer, &f->enemies[i]);
-            buffer += offset;
-            size += offset;
-        }
+        offset = packer_pack_enemy(buffer, &f->enemies[i]);
+        buffer += offset;
+        size += offset;
     }
     for(int i = 0; i < MAX_OBJECTS; i++) {
-        if (f->objects[i].alive == 1) {
-            offset = packer_pack_gameobject(buffer, &f->objects[i]);
-            buffer += offset;
-            size += offset;
-        }
+        offset = packer_pack_gameobject(buffer, &f->objects[i]);
+        buffer += offset;
+        size += offset;
     }
     buffer -= size;
 }

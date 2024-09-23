@@ -76,8 +76,8 @@ int net_server_start(uint16_t port) {
 }
 
 void net_game_thread(net_client_descr_t *clients) {
-    Field *net_field = malloc(sizeof(Field));
-    char* field_buffer = malloc(512);
+    Field *net_field = calloc(1, sizeof(Field));
+    char* field_buffer = malloc(4096);
 
     game_init(net_field);
 
@@ -105,7 +105,11 @@ void net_game_thread(net_client_descr_t *clients) {
         packer_pack_field(field_buffer, net_field);
         Packet* p = (Packet*) packet_create(3, strlen(field_buffer), field_buffer);
         for(int i = 0; i < MAX_CONNECTIONS; i++) queue_push(clients[i].send, p);
-        usleep(30000);
+
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 33333333;  // 1/30th of a second = 33.333333 ms
+        nanosleep(&ts, NULL);
     }
 }
 

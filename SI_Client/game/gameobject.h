@@ -12,9 +12,10 @@ typedef struct GameObject {
     int type;
     int width, height;
     int owner;
+    int alive;
 } GameObject;
 
-GameObject* go_dump(int x, int y, int type, int owner);
+void go_dump(GameObject *go, int x, int y, int type, int owner, int alive);
 void go_render(GameObject *go, SDL_Rect *bounds);
 
 #endif //SI_CLIENT_GAMEOBJECT_H

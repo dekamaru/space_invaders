@@ -23,9 +23,9 @@ int net_client_connect(char* addr, uint16_t port) {
 }
 
 Packet *net_receive_packet() {
-    char *server_reply = malloc(512);
+    char *server_reply = malloc(4096);
     if (recv(net_socket, server_reply, sizeof(Packet), 0) == sizeof(Packet)) {
-        char *buffer = malloc(512);
+        char *buffer = malloc(4096);
         memcpy(buffer, server_reply, sizeof(Packet));
         Packet *p = (Packet *) buffer;
         if (p->data_length != 0) {

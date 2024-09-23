@@ -7,8 +7,7 @@
 #include "gameobject.h"
 #include "../engine/engine.h"
 
-GameObject *go_dump(int x, int y, int type, int owner) {
-    GameObject *go = malloc(sizeof(GameObject));
+void go_dump(GameObject* go, int x, int y, int type, int owner, int alive) {
     switch(type) {
         case 1:
             //bullet
@@ -22,7 +21,7 @@ GameObject *go_dump(int x, int y, int type, int owner) {
     go->owner = owner;
     go->x = x;
     go->y = y;
-    return go;
+    go->alive = alive;
 }
 
 void go_render(GameObject *go, SDL_Rect *bounds) {
