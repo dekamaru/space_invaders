@@ -10,7 +10,7 @@ typedef struct Queue {
     int count;
 } Queue;
 
-Queue* queue_create();
+Queue* queue_create(void);
 void queue_push(Queue* q, Packet *value);
 Packet* queue_pop(Queue* q);
 int queue_empty(Queue* q);

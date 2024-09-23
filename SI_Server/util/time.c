@@ -3,7 +3,7 @@
 #include <time.h>
 #include "time.h"
 
-uint32_t time_get_tick() {
+uint32_t time_get_tick(void) {
     struct timeval t;
     uint32_t tick;
     gettimeofday(&t, NULL);

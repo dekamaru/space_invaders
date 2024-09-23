@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "queue.h"
 
-Queue *queue_create() {
+Queue *queue_create(void) {
     Queue* q = malloc(sizeof(Queue));
     q->front = 0;
     q->count = 0;
